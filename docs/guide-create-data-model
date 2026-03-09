@@ -24,6 +24,56 @@
    - Check `prisma/migrations/` for the new migration folder
    - Check `src/generated/prisma/` for the generated TypeScript types
 
+4. **Create a DTO (Data Transfer Object)**
+   
+   Create `src/dtos/YourModelDto.ts` to define what data is exposed via API:
+   
+   ```typescript
+   /**
+    * Data Transfer Object for YourModel
+    * Excludes sensitive fields and controls what's returned to clients
+    */
+   export interface YourModelDto {
+     id: number;
+     title: string;
+     content: string | null;
+     userId: number;
+     createdAt: Date;
+   }
+
+   /**
+    * Maps from Prisma entity to YourModelDto
+    */
+   export function toYourModelDto(model: {
+     id: number;
+     title: string;
+     content: string | null;
+     userId: number;
+     createdAt: Date;
+   }): YourModelDto {
+     return {
+       id: model.id,
+       title: model.title,
+       content: model.content,
+       userId: model.userId,
+       createdAt: model.createdAt,
+     };
+   }
+
+   /**
+    * Maps an array of Prisma entities to DTO array
+    */
+   export function toYourModelDtoArray(models: Array<{
+     id: number;
+     title: string;
+     content: string | null;
+     userId: number;
+     createdAt: Date;
+   }>): YourModelDto[] {
+     return models.map(toYourModelDto);
+   }
+   ```
+
 ## Common Fields & Types
 - `String` - text
 - `Int` - integer
