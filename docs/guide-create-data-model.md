@@ -1,15 +1,20 @@
 # Guide: Create a New Data Model
 
+This guide walks you through the steps of creating a new data model in Prisma, applying the migration, and setting up a corresponding DTO (Data Transfer Object) for API responses.
+
+> See [guide-create-endpoint](guide-create-endpoint.md) for how to create REST endpoints that utilize the data model in this guide.
+
+---
+
 ## Steps
 
 1. **Define the model** in `prisma/schema.prisma`
    ```prisma
-   model YourModel {
+   model Book {
      id        Int      @id @default(autoincrement())
      title     String
-     content   String?
-     userId    Int
-     user      User     @relation(fields: [userId], references: [id])
+     author    String
+     year      Int?
      createdAt DateTime @default(now())
    }
    ```
@@ -26,51 +31,49 @@
 
 4. **Create a DTO (Data Transfer Object)**
    
-   Create `src/dtos/YourModelDto.ts` to define what data is exposed via API:
+   Create `src/dtos/BookDto.ts` to define what data is exposed via API:
    
    ```typescript
    /**
-    * Data Transfer Object for YourModel
+    * Data Transfer Object for Book
     * Excludes sensitive fields and controls what's returned to clients
     */
-   export interface YourModelDto {
+   export interface BookDto {
      id: number;
      title: string;
-     content: string | null;
-     userId: number;
+     author: string;
+     year: number | null;
      createdAt: Date;
    }
-
    /**
-    * Maps from Prisma entity to YourModelDto
+    * Maps from Prisma entity to BookDto
     */
-   export function toYourModelDto(model: {
+   export function toBookDto(model: {
      id: number;
      title: string;
-     content: string | null;
-     userId: number;
+     author: string;
+     year: number | null;
      createdAt: Date;
-   }): YourModelDto {
+   }): BookDto {
      return {
        id: model.id,
        title: model.title,
-       content: model.content,
-       userId: model.userId,
+       author: model.author,
+       year: model.year,
        createdAt: model.createdAt,
      };
    }
-
    /**
     * Maps an array of Prisma entities to DTO array
     */
-   export function toYourModelDtoArray(models: Array<{
+   export function toBookDtoArray(models: Array<{
      id: number;
      title: string;
-     content: string | null;
-     userId: number;
+     author: string;
+     year: number | null;
      createdAt: Date;
-   }>): YourModelDto[] {
-     return models.map(toYourModelDto);
+   }>): BookDto[] {
+     return models.map(toBookDto);
    }
    ```
 
