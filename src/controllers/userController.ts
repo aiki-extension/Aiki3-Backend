@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
+import { toUserDto, toUserDtoArray, type UserDto } from "../dtos/UserDto.js";
 
 const SALT_ROUNDS = 10;
 
@@ -13,19 +14,18 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
 
   const user = await prisma.user.create({
     data: { name, password: hashed },
-    select: { id: true, name: true, createdAt: true },
   });
 
-  return reply.status(201).send(user);
+  const userDto: UserDto = toUserDto(user);
+  return reply.status(201).send(userDto);
 }
 
 // GET /api/users
 export async function getAllUsers(req: FastifyRequest, reply: FastifyReply) {
-  const users = await prisma.user.findMany({
-    select: { id: true, name: true, createdAt: true },
-  });
+  const users = await prisma.user.findMany();
 
-  return reply.send(users);
+  const userDtos: UserDto[] = toUserDtoArray(users);
+  return reply.send(userDtos);
 }
 
 // GET /api/users/:identifier
@@ -41,12 +41,12 @@ export async function getUserByIdOrName(
     where: isNaN(asNumber)
       ? { name: identifier }
       : { id: asNumber },
-    select: { id: true, name: true, createdAt: true },
   });
 
   if (!user) {
     return reply.status(404).send({ message: "User not found" });
   }
 
-  return reply.send(user);
+  const userDto: UserDto = toUserDto(user);
+  return reply.send(userDto);
 }

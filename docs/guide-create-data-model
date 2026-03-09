@@ -1,0 +1,52 @@
+# Guide: Create a New Data Model
+
+## Steps
+
+1. **Define the model** in `prisma/schema.prisma`
+   ```prisma
+   model YourModel {
+     id        Int      @id @default(autoincrement())
+     title     String
+     content   String?
+     userId    Int
+     user      User     @relation(fields: [userId], references: [id])
+     createdAt DateTime @default(now())
+   }
+   ```
+
+2. **Create and apply migration**
+   ```bash
+   npx prisma migrate dev --name <migration-name>
+   ```
+   This command will generate a new migration file and apply it to the database.
+
+3. **Verify**
+   - Check `prisma/migrations/` for the new migration folder
+   - Check `src/generated/prisma/` for the generated TypeScript types
+
+## Common Fields & Types
+- `String` - text
+- `Int` - integer
+- `Boolean` - true/false
+- `DateTime` - timestamp
+- `String?` - optional field (add `?`)
+- `@default(value)` - set default value
+- `@unique` - enforce uniqueness
+- `@id` - primary key
+
+More field and types are available [here](https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types).
+
+
+## Relations
+- One-to-many: Add array on "one" side: `posts Post[]`
+- Many-to-one: Add single reference: `user User @relation(fields: [userId], references: [id])`
+- Many-to-many: Use implicit relation or explicit join table
+
+More on relations are available [here](https://www.prisma.io/docs/orm/prisma-schema/data-model/relations).
+
+## Next Steps
+- Create controller functions in `src/controllers/`
+- Define routes in `src/routes/`
+- See `guide-create-endpoint` for details
+
+See more in the guide on [setting up endpoints](guide-create-endpoint.md)
