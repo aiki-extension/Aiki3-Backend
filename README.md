@@ -3,7 +3,7 @@
 ## How to run backend locally
 1. Start the PostgreSQL database container with `docker compose up -d` (use `docker compose down -v` to stop and remove volume)
 2. Install dependencies: `npm install`
-3. Set up environment variables (should already be defined for testing purposes)
+3. Rename `.env.template` to `.env.local` and update the necessary fields. For local development, see the `docker-compose.yml` for the default database credentials.
 4. Run database migrations: `npx prisma migrate deploy`
 5. Generate the Prisma client: `npx prisma generate`
 6. Start the development server: `npm run dev`

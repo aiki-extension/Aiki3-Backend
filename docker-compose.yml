@@ -4,9 +4,9 @@ services:
     container_name: fastify_db
     restart: always
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: simple_db
+      POSTGRES_USER: awesomeuser
+      POSTGRES_PASSWORD: secretpw
+      POSTGRES_DB: aikidev
     ports:
       - "5432:5432"
     volumes:
