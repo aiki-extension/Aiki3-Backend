@@ -1,0 +1,57 @@
+# Aiki3 Backend
+
+## How to run backend locally
+1. Start the PostgreSQL database container with `docker compose up -d` (use `docker compose down -v` to stop and remove volume)
+2. Install dependencies: `npm install`
+3. Set up environment variables (should already be defined for testing purposes)
+4. Run database migrations: `npx prisma migrate deploy`
+5. Generate the Prisma client: `npx prisma generate`
+6. Start the development server: `npm run dev`
+7. Access the API at `http://localhost:3000` and the Swagger UI documentation at `http://localhost:3000/docs`
+
+## Technologies
+| Technology | Role |
+|---|---|
+| **Fastify** | HTTP API framework |
+| **Prisma 7** | ORM - database queries and migrations |
+| **PostgreSQL** | Database |
+| **pg** | PostgreSQL driver (used by Prisma's adapter) |
+| **@fastify/jwt** | JWT authentication plugin |
+| **bcrypt** | Password hashing |
+| **@fastify/swagger + swagger-ui** | Auto-generated API documentation |
+
+---
+
+## Useful Commands
+### Node.js
+```bash
+# Install dependencies
+npm install
+
+# Start development server with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server (after build)
+npm start
+```
+
+### Prisma
+```bash
+# Create and apply a new database migration
+npx prisma migrate dev --name <migration-name>
+
+# Regenerate the Prisma client after schema changes
+npx prisma generate
+
+# Apply pending migrations to the database
+npx prisma migrate deploy
+
+# Apply pending migrations and reset the database (will delete all data)
+npx prisma migrate dev
+
+# Open a visual database browser in the browser
+npx prisma studio
+```

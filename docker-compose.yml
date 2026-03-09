@@ -1,0 +1,16 @@
+services:
+  fastify_db:
+    image: postgres:15
+    container_name: fastify_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: simple_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_fastify:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_fastify:
