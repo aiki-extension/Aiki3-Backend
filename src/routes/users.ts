@@ -6,7 +6,7 @@ import {
 } from "../controllers/userController.js";
 
 export default async function userRoutes(app: FastifyInstance) {
-  // Schema validation — Fastify rejects malformed requests automatically
+  // Schema validation for creating a user
   const createUserSchema = {
     schema: {
       body: {

@@ -18,10 +18,7 @@ export async function login(req: FastifyRequest, reply: FastifyReply) {
   }
 
   // Sign a JWT with the user's id and name as the payload
-  const token = await reply.jwtSign(
-    { id: user.id, name: user.name },
-    { expiresIn: "1d" }
-  );
+  const token = await reply.jwtSign({ id: user.id, name: user.name });
 
   return reply.send({ token });
 }

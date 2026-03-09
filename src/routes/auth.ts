@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { login } from "../controllers/authController.js";
 
 export default async function authRoutes(app: FastifyInstance) {
+  // Schema validation for login
   const loginSchema = {
     schema: {
       body: {

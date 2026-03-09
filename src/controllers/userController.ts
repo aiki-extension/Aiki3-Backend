@@ -8,12 +8,12 @@ const SALT_ROUNDS = 10;
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
   const { name, password } = req.body as { name: string; password: string };
 
-  // Hash the password before storing — never store plain text
+  // Hash the password before storing
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
   const user = await prisma.user.create({
     data: { name, password: hashed },
-    select: { id: true, name: true, createdAt: true }, // never return password
+    select: { id: true, name: true, createdAt: true },
   });
 
   return reply.status(201).send(user);
