@@ -10,7 +10,7 @@
 4. Run database migrations: `npx prisma migrate deploy`
 5. Generate the Prisma client: `npx prisma generate`
 6. Start the development server: `npm run dev`
-7. Access the API at `http://localhost:3000` and the Swagger UI documentation at `http://localhost:3000/docs`
+7. Access the API at `http://localhost:<port>` and the Swagger UI documentation at `http://localhost:<port>/docs`, where `<port>` is the port set in your `.env` file.
 
 ## Technologies
 | Technology | Role |
