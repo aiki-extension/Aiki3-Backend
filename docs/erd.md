@@ -7,6 +7,8 @@ erDiagram
         datetime created_at
         boolean is_research_participant
         int daily_learning_goal
+        int reward_time_minutes
+        int session_duration_minutes
         datetime last_active
         time operating_hours_start
         time operating_hours_end
