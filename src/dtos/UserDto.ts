@@ -1,39 +1,27 @@
-/**
- * Data Transfer Object for User responses
- * Excludes sensitive fields like password
- */
+import type { User } from "../generated/prisma/client.js";
+
 export interface UserDto {
   id: number;
-  name: string;
   createdAt: Date;
+  isResearchParticipant: boolean;
+  dailyLearningGoal: number | null;
+  rewardTimeMinutes: number | null;
+  sessionDurationMinutes: number | null;
+  lastActive: Date | null;
+  operatingHoursStart: Date | null;
+  operatingHoursEnd: Date | null;
 }
 
-/**
- * Maps a User entity from Prisma to a UserDto
- * @param user - User object from database (with password field)
- * @returns UserDto without sensitive fields
- */
-export function toUserDto(user: {
-  id: number;
-  name: string;
-  createdAt: Date;
-  password?: string;
-}): UserDto {
+export function toUserDto(user: User): UserDto {
   return {
     id: user.id,
-    name: user.name,
     createdAt: user.createdAt,
+    isResearchParticipant: user.isResearchParticipant,
+    dailyLearningGoal: user.dailyLearningGoal,
+    rewardTimeMinutes: user.rewardTimeMinutes,
+    sessionDurationMinutes: user.sessionDurationMinutes,
+    lastActive: user.lastActive,
+    operatingHoursStart: user.operatingHoursStart,
+    operatingHoursEnd: user.operatingHoursEnd,
   };
-}
-
-/**
- * Maps an array of User entities to UserDto array
- */
-export function toUserDtoArray(users: Array<{
-  id: number;
-  name: string;
-  createdAt: Date;
-  password?: string;
-}>): UserDto[] {
-  return users.map(toUserDto);
 }
