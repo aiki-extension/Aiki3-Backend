@@ -20,5 +20,5 @@ export default async function userRoutes(app: FastifyInstance) {
   };
 
   app.post("/", createUserSchema, createUser);
-  app.get("/", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getCurrentUser);
+  app.get("/me", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getCurrentUser);
 }

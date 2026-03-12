@@ -23,12 +23,12 @@ model User {
   password     String
   createdAt    DateTime @default(now())
   isResearchParticipant Boolean
-  dailyLearningGoal Int?
-  rewardTimeMinutes Int?
-  sessionDurationMinutes Int?
-  lastActive DateTime?
-  operatingHoursStart DateTime? @db.Time
-  operatingHoursEnd DateTime? @db.Time
+  dailyLearningGoalMinutes Int
+  rewardTimeMinutes Int
+  sessionDurationMinutes Int
+  lastActive DateTime
+  operatingHoursStart DateTime @db.Time
+  operatingHoursEnd DateTime @db.Time
   timeWastingSites UserTimeWastingSite[]
   learningSites UserLearningSite[]
   siteSessions SiteSession[]
