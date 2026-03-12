@@ -7,15 +7,15 @@ const SALT_ROUNDS = 10;
 
 // POST /api/users
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
-  const { email_hashed, password } = req.body as { email_hashed: string; password: string };
+  const { email, password } = req.body as { email: string; password: string };
 
-  // Hash the password before storing
-  const hashed_password = await bcrypt.hash(password, SALT_ROUNDS);
+  const email_hashed = await bcrypt.hash(email, SALT_ROUNDS);
+  const password_hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
   const user = await prisma.user.create({
     data: {
       email_hashed,
-      password: hashed_password,
+      password: password_hashed,
       isResearchParticipant: false, // todo: determine this based on a flag in the request body or some other logic
     },
   });
