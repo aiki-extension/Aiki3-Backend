@@ -22,13 +22,11 @@ erDiagram
     user_time_wasting_sites {
         int user_id FK
         int website_id FK
-        datetime created_at
     }
 
     user_learning_sites {
         int user_id FK
         int website_id FK
-        datetime created_at
     }
 
     site_sessions {
@@ -40,6 +38,14 @@ erDiagram
         datetime session_end
     }
 
+    user_behaviour_logs {
+        bigint id PK
+        int user_id FK
+        datetime occurred_at
+        varchar category
+        varchar action
+    }
+
     users ||--o{ user_time_wasting_sites : "has"
     users ||--o{ user_learning_sites : "has"
     websites ||--o{ user_time_wasting_sites : "categorized as"
@@ -47,4 +53,5 @@ erDiagram
     users ||--o{ site_sessions : "has"
     websites ||--o{ site_sessions : "visited in"
     websites ||--o{ site_sessions : "triggered"
+    users ||--o{ user_behaviour_logs : "has"
 ```
