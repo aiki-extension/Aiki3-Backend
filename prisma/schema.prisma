@@ -7,6 +7,16 @@ datasource db {
   provider = "postgresql"
 }
 
+/*
+##################################
+#                                #
+#     WHEN ADDING NEW MODELS     #
+#    PLEASE REMEMBER TO UPDATE   #
+#         THE ER DIAGRAM         #
+#                                #
+##################################
+*/
+
 model User {
   id           Int      @id @default(autoincrement())
   email_hashed String   @unique
