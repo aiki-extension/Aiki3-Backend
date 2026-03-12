@@ -2,7 +2,7 @@
 erDiagram
     users {
         int id PK
-        string email
+        string email_hashed
         string password
         datetime created_at
         boolean is_research_participant
@@ -38,7 +38,7 @@ erDiagram
         datetime session_end
     }
 
-    user_behaviour_logs {
+    user_behavior_logs {
         bigint id PK
         int user_id FK
         datetime occurred_at
@@ -53,5 +53,5 @@ erDiagram
     users ||--o{ site_sessions : "has"
     websites ||--o{ site_sessions : "visited in"
     websites ||--o{ site_sessions : "triggered"
-    users ||--o{ user_behaviour_logs : "has"
+    users ||--o{ user_behavior_logs : "has"
 ```
