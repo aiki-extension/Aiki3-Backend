@@ -1,10 +1,9 @@
 import type { User } from "../generated/prisma/client.js";
 
 export interface UserDto {
-  id: number;
   createdAt: Date;
   isResearchParticipant: boolean;
-  dailyLearningGoal: number | null;
+  dailyLearningGoalMinutes: number | null;
   rewardTimeMinutes: number | null;
   sessionDurationMinutes: number | null;
   lastActive: Date | null;
@@ -14,10 +13,9 @@ export interface UserDto {
 
 export function toUserDto(user: User): UserDto {
   return {
-    id: user.id,
     createdAt: user.createdAt,
     isResearchParticipant: user.isResearchParticipant,
-    dailyLearningGoal: user.dailyLearningGoal,
+    dailyLearningGoalMinutes: user.dailyLearningGoalMinutes,
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
     lastActive: user.lastActive,
