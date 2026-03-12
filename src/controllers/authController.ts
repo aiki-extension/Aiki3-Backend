@@ -3,9 +3,9 @@ import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
 
 export async function login(req: FastifyRequest, reply: FastifyReply) {
-  const { name, password } = req.body as { name: string; password: string };
+  const { email_hashed, password } = req.body as { email_hashed: string; password: string };
 
-  const user = await prisma.user.findUnique({ where: { name } });
+  const user = await prisma.user.findUnique({ where: { email_hashed } });
 
   if (!user) {
     return reply.status(401).send({ message: "Invalid credentials" });
@@ -18,7 +18,7 @@ export async function login(req: FastifyRequest, reply: FastifyReply) {
   }
 
   // Sign a JWT with the user's id and name as the payload
-  const token = await reply.jwtSign({ id: user.id, name: user.name });
+  const token = await reply.jwtSign({ id: user.id, name: user.email_hashed });
 
   return reply.send({ token });
 }
