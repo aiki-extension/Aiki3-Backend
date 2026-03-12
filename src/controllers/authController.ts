@@ -1,9 +1,12 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from "bcrypt";
+import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
 
 export async function login(req: FastifyRequest, reply: FastifyReply) {
-  const { email_hashed, password } = req.body as { email_hashed: string; password: string };
+  const { email, password } = req.body as { email: string; password: string };
+
+  const email_hashed = hashEmail(email);
 
   const user = await prisma.user.findUnique({ where: { email_hashed } });
 

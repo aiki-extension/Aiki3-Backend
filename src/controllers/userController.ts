@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from "bcrypt";
+import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
 import { toUserDto, type UserDto } from "../dtos/UserDto.js";
 
@@ -9,7 +10,9 @@ const SALT_ROUNDS = 10;
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
   const { email, password } = req.body as { email: string; password: string };
 
-  const email_hashed = await bcrypt.hash(email, SALT_ROUNDS);
+  // note: email hash is vulnerable to rainbow table. consider hmac in future if this becomes a concern.
+  const email_hashed = hashEmail(email);
+
   const password_hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
   const user = await prisma.user.create({
