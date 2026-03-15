@@ -13,7 +13,18 @@ export async function buildApp() {
 
   // Register Swagger for API documentation
   await app.register(swagger, {
-    openapi: { info: { title: "Aiki3 API Documentation", version: "1.0.0" } },
+    openapi: {
+      info: { title: "Aiki3 API Documentation", version: "1.0.0" },
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+          },
+        },
+      },
+    },
   });
 
   // Register Swagger UI to serve the documentation at /docs

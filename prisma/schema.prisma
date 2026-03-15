@@ -7,9 +7,76 @@ datasource db {
   provider = "postgresql"
 }
 
+/*
+##################################
+#                                #
+#     WHEN ADDING NEW MODELS     #
+#    PLEASE REMEMBER TO UPDATE   #
+#         THE ER DIAGRAM         #
+#                                #
+##################################
+*/
+
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  email_hashed String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  isResearchParticipant Boolean
+  dailyLearningGoalMinutes Int
+  rewardTimeMinutes Int
+  sessionDurationMinutes Int
+  lastActive DateTime
+  operatingHoursStart DateTime @db.Time
+  operatingHoursEnd DateTime @db.Time
+  timeWastingSites UserTimeWastingSite[]
+  learningSites UserLearningSite[]
+  siteSessions SiteSession[]
+  behaviorLogs UserBehaviorLog[]
+}
+
+model Website {
+  id Int @id @default(autoincrement())
+  domain String @unique
+  users UserTimeWastingSite[]
+  learningUsers UserLearningSite[]
+  siteSessions SiteSession[] @relation("SessionWebsite")
+  triggeredSiteSessions SiteSession[] @relation("TriggeredBySite")
+}
+
+model UserTimeWastingSite {
+  userId Int
+  websiteId Int
+  user User @relation(fields: [userId], references: [id])
+  website Website @relation(fields: [websiteId], references: [id])
+  @@id([userId, websiteId])
+}
+
+model UserLearningSite {
+  userId Int
+  websiteId Int
+  user User @relation(fields: [userId], references: [id])
+  website Website @relation(fields: [websiteId], references: [id])
+  @@id([userId, websiteId])
+}
+
+model SiteSession {
+  id Int @id @default(autoincrement())
+  userId Int
+  websiteId Int
+  triggeredBySiteId Int?
+  sessionStart DateTime
+  sessionEnd DateTime
+  user User @relation(fields: [userId], references: [id])
+  website Website @relation("SessionWebsite", fields: [websiteId], references: [id])
+  triggeredBySite Website? @relation("TriggeredBySite", fields: [triggeredBySiteId], references: [id])
+}
+
+model UserBehaviorLog {
+  id BigInt @id @default(autoincrement())
+  userId Int
+  occurredAt DateTime @default(now())
+  category String
+  action String
+  user User @relation(fields: [userId], references: [id])
 }

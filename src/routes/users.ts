@@ -1,8 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
   createUser,
-  getAllUsers,
-  getUserByIdOrName,
+  getCurrentUser
 } from "../controllers/userController.js";
 
 export default async function userRoutes(app: FastifyInstance) {
@@ -11,9 +10,9 @@ export default async function userRoutes(app: FastifyInstance) {
     schema: {
       body: {
         type: "object",
-        required: ["name", "password"],
+        required: ["email", "password"],
         properties: {
-          name: { type: "string", minLength: 2 },
+          email: { type: "string", format: "email" },
           password: { type: "string", minLength: 6 },
         },
       },
@@ -21,6 +20,5 @@ export default async function userRoutes(app: FastifyInstance) {
   };
 
   app.post("/", createUserSchema, createUser);
-  app.get("/", { preHandler: [app.authenticate] }, getAllUsers);
-  app.get("/:identifier", getUserByIdOrName);
+  app.get("/me", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getCurrentUser);
 }
