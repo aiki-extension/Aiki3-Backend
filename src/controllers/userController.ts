@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from "bcrypt";
 import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
-import { toUserDto, type UserDto } from "../dtos/UserDto.js";
+import { toUserDto, toUserSettingsDto, type UserDto, type UserSettingsDto } from "../dtos/UserDto.js";
 
 const SALT_ROUNDS = 10;
 
@@ -54,4 +54,48 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
 
   const userDto: UserDto = toUserDto(user);
   return reply.send(userDto);
+}
+
+// GET /api/users/settings
+export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) {
+  const userId = (req.user as { id : number }).id;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    return reply.status(404).send({ message: "User not found" });
+  }
+
+  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
+  return reply.send(userSettingsDto);
+}
+
+// PATCH /api/users/settings
+export async function updateUserSettings(req: FastifyRequest, reply: FastifyReply) {
+  const userId = (req.user as { id : number }).id; // Get user ID from authenticated request (jwt)
+  const {
+    dailyLearningGoalMinutes, 
+    rewardTimeMinutes, 
+    sessionDurationMinutes, 
+    lastActive, 
+    operatingHoursStart, 
+    operatingHoursEnd 
+  } = req.body as Partial<UserSettingsDto>; // Partial allows any subset of the settings to be updated
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(dailyLearningGoalMinutes !== undefined && { dailyLearningGoalMinutes }),
+      ...(rewardTimeMinutes !== undefined && { rewardTimeMinutes }),
+      ...(sessionDurationMinutes !== undefined && { sessionDurationMinutes }),
+      ...(lastActive !== undefined && { lastActive }),
+      ...(operatingHoursStart !== undefined && { operatingHoursStart }),
+      ...(operatingHoursEnd !== undefined && { operatingHoursEnd }),
+    },
+  });
+
+  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
+  return reply.send(userSettingsDto);
 }
