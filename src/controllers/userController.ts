@@ -42,7 +42,7 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
 
 // GET /api/users/me
 export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
-  const userId = (req.user as { id : number }).id;
+  const userId = req.user.id;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -58,7 +58,7 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
 
 // GET /api/users/settings
 export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) {
-  const userId = (req.user as { id : number }).id;
+  const userId = req.user.id;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -74,7 +74,7 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 
 // PATCH /api/users/settings
 export async function updateUserSettings(req: FastifyRequest, reply: FastifyReply) {
-  const userId = (req.user as { id: number }).id;
+  const userId = req.user.id;
   const payload = req.body as UpdateUserSettingsDto;
 
   const user = await prisma.user.update({

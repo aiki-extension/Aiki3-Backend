@@ -42,6 +42,12 @@ export async function buildApp() {
     async function (req: FastifyRequest, reply: FastifyReply) {
       try {
         await req.jwtVerify();
+
+        // Check the JWT payload
+        const user = req.user;
+        if (typeof user?.id !== "number" || typeof user?.name !== "string") {
+          return reply.status(401).send({ message: "Invalid token payload" });
+        }
       } catch {
         return reply.status(401).send({ message: "Unauthorized" });
       }
