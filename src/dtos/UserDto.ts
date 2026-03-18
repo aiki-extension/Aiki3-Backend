@@ -1,10 +1,5 @@
 import type { User } from "../generated/prisma/client.js";
 
-export type Time = {
-  hours: number;
-  minutes: number;
-};
-
 export interface UserDto {
   createdAt: Date;
   isResearchParticipant: boolean;
@@ -12,8 +7,8 @@ export interface UserDto {
   rewardTimeMinutes: number;
   sessionDurationMinutes: number;
   lastActive: Date;
-  operatingHoursStart: Time;
-  operatingHoursEnd: Time;
+  operatingStartMinutes: number;
+  operatingEndMinutes: number;
 }
 
 
@@ -23,8 +18,8 @@ export interface UserSettingsDto {
   rewardTimeMinutes: number;
   sessionDurationMinutes: number;
   lastActive: Date;
-  operatingHoursStart: Time;
-  operatingHoursEnd: Time;
+  operatingStartMinutes: number;
+  operatingEndMinutes: number;
 }
 
 export interface UpdateUserSettingsDto {
@@ -32,21 +27,8 @@ export interface UpdateUserSettingsDto {
   rewardTimeMinutes?: number;
   sessionDurationMinutes?: number;
   lastActive?: Date;
-  operatingHoursStart?: Time;
-  operatingHoursEnd?: Time;
-}
-
-// Helper function to convert Date to Time object
-function dateToTimeObj(date: Date): Time {
-  return {
-    hours: date.getUTCHours(),
-    minutes: date.getUTCMinutes(),
-  };
-}
-
-// Helper function to convert Time object to Date (using a fixed date since we only care about time)
-function timeToDateObj(time: Time): Date {
-  return new Date(Date.UTC(1970, 0, 1, time.hours, time.minutes));
+  operatingStartMinutes?: number;
+  operatingEndMinutes?: number;
 }
 
 export function toUserDto(user: User): UserDto {
@@ -57,8 +39,8 @@ export function toUserDto(user: User): UserDto {
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
     lastActive: user.lastActive,
-    operatingHoursStart: dateToTimeObj(user.operatingHoursStart),
-    operatingHoursEnd: dateToTimeObj(user.operatingHoursEnd),
+    operatingStartMinutes: user.operatingStartMinutes,
+    operatingEndMinutes: user.operatingEndMinutes,
   };
 }
 
@@ -68,8 +50,8 @@ export function toUserSettingsDto(user: User): UserSettingsDto {
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
     lastActive: user.lastActive,
-    operatingHoursStart: dateToTimeObj(user.operatingHoursStart),
-    operatingHoursEnd: dateToTimeObj(user.operatingHoursEnd),
+    operatingStartMinutes: user.operatingStartMinutes,
+    operatingEndMinutes: user.operatingEndMinutes,
   };
 }
 
@@ -85,11 +67,11 @@ export function toUserSettingsUpdateData(input: UpdateUserSettingsDto) {
       sessionDurationMinutes: input.sessionDurationMinutes,
     }),
     ...(input.lastActive !== undefined && { lastActive: input.lastActive }),
-    ...(input.operatingHoursStart !== undefined && {
-      operatingHoursStart: timeToDateObj(input.operatingHoursStart),
+    ...(input.operatingStartMinutes !== undefined && {
+      operatingStartMinutes: input.operatingStartMinutes,
     }),
-    ...(input.operatingHoursEnd !== undefined && {
-      operatingHoursEnd: timeToDateObj(input.operatingHoursEnd),
+    ...(input.operatingEndMinutes !== undefined && {
+      operatingEndMinutes: input.operatingEndMinutes,
     }),
   };
 }

@@ -10,8 +10,8 @@ const IS_RESEARCH_PARTICIPANT_DEFAULT = false;
 const DAILY_LEARNING_GOAL_DEFAULT = 30;
 const REWARD_TIME_MINUTES_DEFAULT = 5;
 const SESSION_DURATION_MINUTES_DEFAULT = 2;
-const OPERATING_HOURS_START_DEFAULT = new Date(2026, 0, 1, 8, 0, 0); // 08:00 (date is discarded)
-const OPERATING_HOURS_END_DEFAULT = new Date(2026, 0, 1, 18, 0, 0); // 18:00 (date is discarded)
+const OPERATING_START_MINUTES_DEFAULT = 480; // 08:00 (8 * 60)
+const OPERATING_END_MINUTES_DEFAULT = 1080; // 18:00 (18 * 60)
 
 // POST /api/users
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
@@ -31,8 +31,8 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
       rewardTimeMinutes: REWARD_TIME_MINUTES_DEFAULT,
       sessionDurationMinutes: SESSION_DURATION_MINUTES_DEFAULT,
       lastActive: new Date(),
-      operatingHoursStart: OPERATING_HOURS_START_DEFAULT,
-      operatingHoursEnd: OPERATING_HOURS_END_DEFAULT,
+      operatingStartMinutes: OPERATING_START_MINUTES_DEFAULT,
+      operatingEndMinutes: OPERATING_END_MINUTES_DEFAULT,
     },
   });
 

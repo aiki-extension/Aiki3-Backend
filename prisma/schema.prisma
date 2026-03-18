@@ -27,8 +27,8 @@ model User {
   rewardTimeMinutes Int
   sessionDurationMinutes Int
   lastActive DateTime
-  operatingHoursStart DateTime @db.Time
-  operatingHoursEnd DateTime @db.Time
+  operatingStartMinutes Int
+  operatingEndMinutes Int
   timeWastingSites UserTimeWastingSite[]
   learningSites UserLearningSite[]
   siteSessions SiteSession[]
