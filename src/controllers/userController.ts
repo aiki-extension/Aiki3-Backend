@@ -2,7 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from "bcrypt";
 import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
-import { toUserDto, type UserDto } from "../dtos/UserDto.js";
+import { toUserDto, toUserSettingsDto, toUserSettingsUpdateData, type UpdateUserSettingsDto, type UserDto, type UserSettingsDto } from "../dtos/UserDto.js";
 
 const SALT_ROUNDS = 10;
 
@@ -10,8 +10,8 @@ const IS_RESEARCH_PARTICIPANT_DEFAULT = false;
 const DAILY_LEARNING_GOAL_DEFAULT = 30;
 const REWARD_TIME_MINUTES_DEFAULT = 5;
 const SESSION_DURATION_MINUTES_DEFAULT = 2;
-const OPERATING_HOURS_START_DEFAULT = new Date(2026, 0, 1, 8, 0, 0); // 08:00 (date is discarded)
-const OPERATING_HOURS_END_DEFAULT = new Date(2026, 0, 1, 18, 0, 0); // 18:00 (date is discarded)
+const OPERATING_START_MINUTES_DEFAULT = 480; // 08:00 (8 * 60)
+const OPERATING_END_MINUTES_DEFAULT = 1080; // 18:00 (18 * 60)
 
 // POST /api/users
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
@@ -31,8 +31,8 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
       rewardTimeMinutes: REWARD_TIME_MINUTES_DEFAULT,
       sessionDurationMinutes: SESSION_DURATION_MINUTES_DEFAULT,
       lastActive: new Date(),
-      operatingHoursStart: OPERATING_HOURS_START_DEFAULT,
-      operatingHoursEnd: OPERATING_HOURS_END_DEFAULT,
+      operatingStartMinutes: OPERATING_START_MINUTES_DEFAULT,
+      operatingEndMinutes: OPERATING_END_MINUTES_DEFAULT,
     },
   });
 
@@ -42,7 +42,7 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
 
 // GET /api/users/me
 export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
-  const userId = (req.user as { id : number }).id;
+  const userId = req.user.id;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -54,4 +54,34 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
 
   const userDto: UserDto = toUserDto(user);
   return reply.send(userDto);
+}
+
+// GET /api/users/settings
+export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) {
+  const userId = req.user.id;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    return reply.status(404).send({ message: "User not found" });
+  }
+
+  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
+  return reply.send(userSettingsDto);
+}
+
+// PATCH /api/users/settings
+export async function updateUserSettings(req: FastifyRequest, reply: FastifyReply) {
+  const userId = req.user.id;
+  const payload = req.body as UpdateUserSettingsDto;
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: toUserSettingsUpdateData(payload),
+  });
+
+  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
+  return reply.send(userSettingsDto);
 }

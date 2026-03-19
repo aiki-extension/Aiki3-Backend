@@ -3,12 +3,32 @@ import type { User } from "../generated/prisma/client.js";
 export interface UserDto {
   createdAt: Date;
   isResearchParticipant: boolean;
-  dailyLearningGoalMinutes: number | null;
-  rewardTimeMinutes: number | null;
-  sessionDurationMinutes: number | null;
-  lastActive: Date | null;
-  operatingHoursStart: Date | null;
-  operatingHoursEnd: Date | null;
+  dailyLearningGoalMinutes: number;
+  rewardTimeMinutes: number;
+  sessionDurationMinutes: number;
+  lastActive: Date;
+  operatingStartMinutes: number;
+  operatingEndMinutes: number;
+}
+
+
+// Used to fetch and update user settings
+export interface UserSettingsDto {
+  dailyLearningGoalMinutes: number;
+  rewardTimeMinutes: number;
+  sessionDurationMinutes: number;
+  lastActive: Date;
+  operatingStartMinutes: number;
+  operatingEndMinutes: number;
+}
+
+export interface UpdateUserSettingsDto {
+  dailyLearningGoalMinutes?: number;
+  rewardTimeMinutes?: number;
+  sessionDurationMinutes?: number;
+  lastActive?: Date;
+  operatingStartMinutes?: number;
+  operatingEndMinutes?: number;
 }
 
 export function toUserDto(user: User): UserDto {
@@ -19,7 +39,39 @@ export function toUserDto(user: User): UserDto {
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
     lastActive: user.lastActive,
-    operatingHoursStart: user.operatingHoursStart,
-    operatingHoursEnd: user.operatingHoursEnd,
+    operatingStartMinutes: user.operatingStartMinutes,
+    operatingEndMinutes: user.operatingEndMinutes,
+  };
+}
+
+export function toUserSettingsDto(user: User): UserSettingsDto {
+  return {
+    dailyLearningGoalMinutes: user.dailyLearningGoalMinutes,
+    rewardTimeMinutes: user.rewardTimeMinutes,
+    sessionDurationMinutes: user.sessionDurationMinutes,
+    lastActive: user.lastActive,
+    operatingStartMinutes: user.operatingStartMinutes,
+    operatingEndMinutes: user.operatingEndMinutes,
+  };
+}
+
+export function toUserSettingsUpdateData(input: UpdateUserSettingsDto) {
+  return {
+    ...(input.dailyLearningGoalMinutes !== undefined && {
+      dailyLearningGoalMinutes: input.dailyLearningGoalMinutes,
+    }),
+    ...(input.rewardTimeMinutes !== undefined && {
+      rewardTimeMinutes: input.rewardTimeMinutes,
+    }),
+    ...(input.sessionDurationMinutes !== undefined && {
+      sessionDurationMinutes: input.sessionDurationMinutes,
+    }),
+    ...(input.lastActive !== undefined && { lastActive: input.lastActive }),
+    ...(input.operatingStartMinutes !== undefined && {
+      operatingStartMinutes: input.operatingStartMinutes,
+    }),
+    ...(input.operatingEndMinutes !== undefined && {
+      operatingEndMinutes: input.operatingEndMinutes,
+    }),
   };
 }

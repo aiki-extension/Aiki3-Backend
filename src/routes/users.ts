@@ -1,7 +1,9 @@
 import type { FastifyInstance } from "fastify";
 import {
   createUser,
-  getCurrentUser
+  getCurrentUser,
+  getUserSettings,
+  updateUserSettings
 } from "../controllers/userController.js";
 
 export default async function userRoutes(app: FastifyInstance) {
@@ -19,6 +21,28 @@ export default async function userRoutes(app: FastifyInstance) {
     },
   };
 
+  const updateUserSettingsSchema = {
+    preHandler: [app.authenticate],
+    schema: {
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: "object",
+        minProperties: 1,
+        additionalProperties: false,
+        properties: {
+          dailyLearningGoalMinutes: { type: "number" },
+          rewardTimeMinutes: { type: "number" },
+          sessionDurationMinutes: { type: "number" },
+          lastActive: { type: "string", format: "date-time" },
+          operatingStartMinutes: { type: "number" },
+          operatingEndMinutes: { type: "number" },
+        },
+      },
+    },
+  };
+
   app.post("/", createUserSchema, createUser);
   app.get("/me", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getCurrentUser);
+  app.get("/settings", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getUserSettings);
+  app.patch("/settings", updateUserSettingsSchema, updateUserSettings);
 }
