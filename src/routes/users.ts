@@ -27,6 +27,8 @@ export default async function userRoutes(app: FastifyInstance) {
       security: [{ bearerAuth: [] }],
       body: {
         type: "object",
+        minProperties: 1,
+        additionalProperties: false,
         properties: {
           dailyLearningGoalMinutes: { type: "number" },
           rewardTimeMinutes: { type: "number" },

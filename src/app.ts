@@ -9,7 +9,14 @@ import swaggerUi from "@fastify/swagger-ui";
 export async function buildApp() {
 
   // Create Fastify instance
-  const app = Fastify({ logger: true });
+  const app = Fastify({
+    logger: true,
+    ajv: {
+      customOptions: {
+        removeAdditional: false,
+      },
+    },
+  });
 
   // Register Swagger for API documentation
   await app.register(swagger, {
