@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from "bcrypt";
 import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
+import { signToken } from "../lib/signToken.js";
 
 export async function login(req: FastifyRequest, reply: FastifyReply) {
   const { email, password } = req.body as { email: string; password: string };
@@ -21,7 +22,7 @@ export async function login(req: FastifyRequest, reply: FastifyReply) {
   }
 
   // Sign a JWT with the user's id and name as the payload
-  const token = await reply.jwtSign({ id: user.id, name: user.email_hashed });
+  const token = await signToken(reply, user);
 
   return reply.send({ token });
 }

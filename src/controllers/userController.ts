@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
 import { toUserDto, toUserSettingsDto, toUserSettingsUpdateData, type UpdateUserSettingsDto, type UserDto, type UserSettingsDto } from "../dtos/UserDto.js";
+import { signToken } from "../lib/signToken.js";
 
 const SALT_ROUNDS = 10;
 
@@ -36,8 +37,12 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
     },
   });
 
-  const userDto: UserDto = toUserDto(user);
-  return reply.status(201).send(userDto);
+  // const userDto: UserDto = toUserDto(user);
+  // return reply.status(201).send(userDto);
+
+  // login the user immediately after registration
+  const token = await signToken(reply, user);
+  return reply.status(201).send({ token });
 }
 
 // GET /api/users/me
