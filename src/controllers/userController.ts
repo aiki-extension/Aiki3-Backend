@@ -12,7 +12,7 @@ const DAILY_LEARNING_GOAL_DEFAULT = 30;
 const REWARD_TIME_MINUTES_DEFAULT = 2;
 const SESSION_DURATION_MINUTES_DEFAULT = 5;
 const OPERATING_START_MINUTES_DEFAULT = 480; // 08:00 (8 * 60)
-const OPERATING_END_MINUTES_DEFAULT = 1080; // 18:00 (18 * 60)
+const OPERATING_END_MINUTES_DEFAULT = 1020; // 17:00 (17 * 60)
 
 // POST /api/users
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
