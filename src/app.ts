@@ -5,6 +5,7 @@ import userRoutes from "./routes/users.js";
 import authRoutes from "./routes/auth.js";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
+import timeWastingSiteRoutes from "./routes/timeWastingSites.js";
 
 export async function buildApp() {
 
@@ -64,6 +65,7 @@ export async function buildApp() {
   // Register route modules
   app.register(authRoutes, { prefix: "/api/auth" });
   app.register(userRoutes, { prefix: "/api/users" });
+  app.register(timeWastingSiteRoutes, { prefix: "/api/time-wasting-sites" });
 
   return app;
 }
