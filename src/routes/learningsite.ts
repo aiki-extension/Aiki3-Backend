@@ -3,7 +3,7 @@ import { getLearningsiteById } from "../controllers/learningController.js";
 
 export default async function learningsiteRoutes(app: FastifyInstance) {
   app.get(
-    "/:id",
+    "/learningsites",
     {
       schema: {
         params: {

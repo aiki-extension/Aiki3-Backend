@@ -4,14 +4,11 @@ import { toUserLearningSiteDto, type UserLearningSiteDto } from "../dtos/UserLea
 
 // GET /api/learningsites
 export async function getLearningsiteById(req: FastifyRequest, reply: FastifyReply) {
-  const { userId, websiteId } = req.body as { userId: string; websiteId: string };
+  const { userId } = req.body as { userId: string };
 
-  const learningsite = await prisma.userLearningSite.findUnique({
+  const learningsite = await prisma.userLearningSite.findMany({ // There should only be one per user, but using findMany just in case
     where: {
-      userId_websiteId: {
-        userId: Number(userId),
-        websiteId: Number(websiteId),
-      },
+      userId: Number(userId),
     },
     include: { website: true },
   });
@@ -19,6 +16,8 @@ export async function getLearningsiteById(req: FastifyRequest, reply: FastifyRep
   if (!learningsite) {
     return reply.status(404).send({ message: "Learning site not found" });
   }
+
+
 
   const dto: UserLearningSiteDto = toUserLearningSiteDto(learningsite);
   return reply.send(dto);
