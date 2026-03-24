@@ -37,9 +37,9 @@ export default async function learningsiteRoutes(app: FastifyInstance) {
           201: {
             type: "object",
             properties: {
-              id: { type: "number" },
-              title: { type: "string" },
-              author: { type: "string" },
+              userId: { type: "number" },
+              websiteId: { type: "string" },
+              domain: { type: "string" },
             },
           },
         },
