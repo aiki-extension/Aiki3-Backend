@@ -2,9 +2,9 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import prisma from "../lib/prisma.js";
 import { toUserLearningSiteDto, type UserLearningSiteDto } from "../dtos/UserLearningSiteDto.js";
 
-// GET /api/learningsites/:userId/:websiteId
+// GET /api/learningsites
 export async function getLearningsiteById(req: FastifyRequest, reply: FastifyReply) {
-  const { userId, websiteId } = req.params as { userId: string; websiteId: string };
+  const { userId, websiteId } = req.body as { userId: string; websiteId: string };
 
   const learningsite = await prisma.userLearningSite.findUnique({
     where: {
