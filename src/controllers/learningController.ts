@@ -6,7 +6,7 @@ import { toUserLearningSiteDto, type UserLearningSiteDto } from "../dtos/UserLea
 export async function getLearningsiteById(req: FastifyRequest, reply: FastifyReply) {
   const { userId } = req.body as { userId: string };
 
-  const learningsite = await prisma.userLearningSite.findMany({ // There should only be one per user, but using findMany just in case
+  const learningsite = await prisma.userLearningSite.findUnique({
     where: {
       userId: Number(userId),
     },
