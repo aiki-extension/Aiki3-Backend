@@ -67,14 +67,14 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    include: { inviteCode: true },
   });
 
   if (!user) {
     return reply.status(404).send({ message: "User not found" });
   }
 
-  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
-  return reply.send(userSettingsDto);
+  return reply.send(toUserSettingsDto(user));
 }
 
 // PATCH /api/users/settings
@@ -82,11 +82,23 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
   const userId = req.user.id;
   const payload = req.body as UpdateUserSettingsDto;
 
+  if (payload.inviteCode !== undefined) {
+    const inviteCode = await prisma.inviteCode.findUnique({
+      where: { code: payload.inviteCode },
+    });
+    if (!inviteCode) {
+      return reply.status(404).send({ error: "Invite code not found" });
+    }
+    if (!inviteCode.isActive) {
+      return reply.status(400).send({ error: "Invite code is no longer active" });
+    }
+  }
+
   const user = await prisma.user.update({
     where: { id: userId },
     data: toUserSettingsUpdateData(payload),
+    include: { inviteCode: true },
   });
 
-  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
-  return reply.send(userSettingsDto);
+  return reply.send(toUserSettingsDto(user));
 }
