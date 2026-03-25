@@ -83,6 +83,17 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
   const payload = req.body as UpdateUserSettingsDto;
 
   if (payload.inviteCode !== undefined) {
+
+    // If the inviteCode is an empty string, remove the existing invite code
+    if (payload.inviteCode === "") {
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { inviteCode: { disconnect: true } },
+        include: { inviteCode: true },
+      });
+      return reply.send(toUserSettingsDto(user));
+    }
+
     const inviteCode = await prisma.inviteCode.findUnique({
       where: { code: payload.inviteCode },
     });
@@ -99,6 +110,5 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
     data: toUserSettingsUpdateData(payload),
     include: { inviteCode: true },
   });
-
   return reply.send(toUserSettingsDto(user));
 }
