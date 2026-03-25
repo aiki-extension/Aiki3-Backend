@@ -15,7 +15,7 @@ export interface UserDto {
 // Used to fetch and update user settings
 export interface UserSettingsDto {
   dailyLearningGoalMinutes: number;
-  inviteCode?: string;
+  inviteCode?: { code: string; isActive: boolean };
   rewardTimeMinutes: number;
   sessionDurationMinutes: number;
   lastActive: Date;
@@ -46,9 +46,11 @@ export function toUserDto(user: User): UserDto {
   };
 }
 
-export function toUserSettingsDto(user: User & { inviteCode: { code: string } | null }): UserSettingsDto {
+export function toUserSettingsDto(user: User & { inviteCode: { code: string; isActive: boolean } | null }): UserSettingsDto {
   return {
-    ...(user.inviteCode && { inviteCode: user.inviteCode.code }), // Omit inviteCode if it's null
+    ...(user.inviteCode && {
+      inviteCode: { code: user.inviteCode.code, isActive: user.inviteCode.isActive }, // Omit inviteCode if it's null
+    }),
     dailyLearningGoalMinutes: user.dailyLearningGoalMinutes,
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
