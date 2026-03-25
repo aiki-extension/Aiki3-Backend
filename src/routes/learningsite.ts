@@ -1,36 +1,39 @@
 import type { FastifyInstance } from "fastify";
-import { getLearningsiteById, createLearningsite } from "../controllers/learningController.js";
+import { getLearningsiteById, upsertLearningsite } from "../controllers/learningController.js";
 
 export default async function learningsiteRoutes(app: FastifyInstance) {
   app.get(
-    "/learningsite",
+    "/",
     {
+      preHandler: [app.authenticate],
       schema: {
+        security: [{ bearerAuth: [] }],
         response: {
           200: {
             type: "object",
             properties: {
               userId: { type: "number" },
-              websiteId: { type: "string" },
+              websiteId: { type: "number" },
               domain: { type: "string" },
             },
           },
         },
       },
-      preHandler: [app.authenticate],
     },
     getLearningsiteById
   );
 
-  app.post(
-    "/learningsite",
+  app.patch(
+    "/",
     {
+      preHandler: [app.authenticate],
       schema: {
+        security: [{ bearerAuth: [] }],
         body: {
           type: "object",
           required: ["domain"],
           properties: {
-            domain: { type: "string", format: "domain" },
+            domain: { type: "string" },
           },
         },
         response: {
@@ -38,14 +41,13 @@ export default async function learningsiteRoutes(app: FastifyInstance) {
             type: "object",
             properties: {
               userId: { type: "number" },
-              websiteId: { type: "string" },
+              websiteId: { type: "number" },
               domain: { type: "string" },
             },
           },
         },
       },
-      preHandler: [app.authenticate],
     },
-    createLearningsite
+    upsertLearningsite
   );
 }

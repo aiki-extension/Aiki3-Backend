@@ -10,7 +10,7 @@ export async function getLearningsiteById(req: FastifyRequest, reply: FastifyRep
 
   const learningsite = await prisma.userLearningSite.findUnique({
     where: {
-      userId: Number(userId),
+      userId: userId,
     },
     include: { website: true },
   });
@@ -28,7 +28,7 @@ export async function getLearningsiteById(req: FastifyRequest, reply: FastifyRep
 
 
 // POST /api/learningsite
-export async function createLearningsite(req: FastifyRequest, reply: FastifyReply) {
+export async function upsertLearningsite(req: FastifyRequest, reply: FastifyReply) {
   const { domain } = req.body as { domain: string };
   const userId = req.user.id;
 
@@ -39,10 +39,12 @@ export async function createLearningsite(req: FastifyRequest, reply: FastifyRepl
     create: { domain },
   });
 
-  // Creates the learning site entry, linking the user and the website
-  const learningsite = await prisma.userLearningSite.create({
-    data: {
-      userId: Number(userId),
+  // Creates or updates the learning site entry, linking the user and the website
+  const learningsite = await prisma.userLearningSite.upsert({
+    where: { userId: userId },
+    update: { websiteId: website.id },
+    create: {
+      userId: userId,
       websiteId: website.id,
     },
     include: { website: true },
