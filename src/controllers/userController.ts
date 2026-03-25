@@ -67,6 +67,11 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    include: {
+      timeWastingSites: {
+        include: { website: true }
+      }
+    }
   });
 
   if (!user) {
@@ -81,10 +86,49 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 export async function updateUserSettings(req: FastifyRequest, reply: FastifyReply) {
   const userId = req.user.id;
   const payload = req.body as UpdateUserSettingsDto;
+  
+  // Seperate time wasting site arrays from other settings
+  const { addTimeWastingSites, removeTimeWastingSites, ...remainingSettings } = payload;
+
+  let sitesToRemove = {};
+  if (removeTimeWastingSites?.length) {
+    // Looks up the website IDs for the given domains
+    const websites = await prisma.website.findMany({
+      where: { domain: { in: removeTimeWastingSites } },
+      select: { id: true },
+    });
+    sitesToRemove = {
+      timeWastingSites: {
+        deleteMany: { websiteId: { in: websites.map((w) => w.id) } },
+      },
+    }
+  }
+
+  if (addTimeWastingSites?.length) {
+    for (const domain of addTimeWastingSites) {
+      // Reuse existing website if the domain already exists, otherwise create it
+      const website = await prisma.website.upsert({
+        where: { domain },
+        create: { domain },
+        update: {},
+      });
+      // Link the website to the user if not already linked, otherwise do nothing
+      await prisma.userTimeWastingSite.createMany({
+        data: [{ userId, websiteId: website.id }],
+        skipDuplicates: true,
+      });
+    }
+  }
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data: toUserSettingsUpdateData(payload),
+    data: { // "..." merges the two data together
+      ...toUserSettingsUpdateData(remainingSettings),
+      ...sitesToRemove,
+    },
+    include: {
+      timeWastingSites: { include: { website: true } },
+    },
   });
 
   const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
