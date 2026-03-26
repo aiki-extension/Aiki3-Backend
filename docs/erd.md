@@ -17,13 +17,13 @@ erDiagram
 
     invite_codes {
         int id PK
-        string code UQ
+        string code UK
         boolean is_active
     }
 
     websites {
         int id PK
-        string domain UQ
+        string domain UK
     }
 
     user_time_wasting_sites {
