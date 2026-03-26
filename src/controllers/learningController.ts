@@ -27,7 +27,7 @@ export async function getLearningsiteById(req: FastifyRequest, reply: FastifyRep
 
 
 
-// POST /api/learningsite
+// Patch /api/learningsite
 export async function upsertLearningsite(req: FastifyRequest, reply: FastifyReply) {
   const { domain } = req.body as { domain: string };
   const userId = req.user.id;
