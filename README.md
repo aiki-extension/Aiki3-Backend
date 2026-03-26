@@ -14,6 +14,7 @@
 
 ### Note:
 You may also find the `quick-setup.sh` script to be useful when having to quickly setup the backend for local testing. (Currently targets shells for Linux systems)
+- To run execute `./quick-setup.sh`from a shell in the root directory of the project
 
 ## Technologies
 | Technology | Role |
