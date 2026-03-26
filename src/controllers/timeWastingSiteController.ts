@@ -2,6 +2,37 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import prisma from "../lib/prisma.js";
 import { toUserTimeWastingSiteDto, type UserTimeWastingSiteDto } from "../dtos/UserTimeWastingSiteDto.js"
 
+export async function deleteUserTimeWastingSite(req: FastifyRequest, reply: FastifyReply) {
+    const userId = req.user.id;
+    const { domain } = req.params as { domain: string };
+
+    try {
+        // Find the website by domain
+        const website = await prisma.website.findUnique({
+            where: { domain },
+        });
+
+        if (!website) {
+            return reply.status(404).send({ message: "Time-wasting site not found" });
+        }
+        // Delete association between the user and the website
+        const site = await prisma.userTimeWastingSite.delete({
+            where: {
+                userId_websiteId: {
+                    userId,
+                    websiteId: website.id,
+                }
+            }
+        });
+
+        return reply.status(200).send(); 
+    } catch (error) {
+        console.error("Error deleting time-wasting site:", error);
+        return reply.status(500).send({ message: "Failed to delete time-wasting site" });
+    }
+    
+}
+
 // GET /api/time-wasting-sites
 export async function getUserTimeWastingSites(req: FastifyRequest, reply: FastifyReply) {
     const userId = req.user.id;
