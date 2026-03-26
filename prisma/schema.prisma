@@ -30,7 +30,7 @@ model User {
   operatingStartMinutes Int
   operatingEndMinutes Int
   timeWastingSites UserTimeWastingSite[]
-  learningSites UserLearningSite?
+  learningSite UserLearningSite?
   siteSessions SiteSession[]
   behaviorLogs UserBehaviorLog[]
 }
