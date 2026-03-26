@@ -3,7 +3,6 @@ import jwt from "@fastify/jwt";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import userRoutes from "./routes/users.js";
 import authRoutes from "./routes/auth.js";
-import learningsiteRoutes from "./routes/learningsite.js";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 
@@ -65,7 +64,7 @@ export async function buildApp() {
   // Register route modules
   app.register(authRoutes, { prefix: "/api/auth" });
   app.register(userRoutes, { prefix: "/api/users" });
-  app.register(learningsiteRoutes, { prefix: "/api/learningsite" });
+
 
 
   return app;

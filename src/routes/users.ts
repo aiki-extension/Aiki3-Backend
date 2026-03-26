@@ -5,7 +5,6 @@ import {
   getUserSettings,
   updateUserSettings
 } from "../controllers/userController.js";
-import learningsiteRoutes from "./learningsite.js";
 
 export default async function userRoutes(app: FastifyInstance) {
   // Schema validation for creating a user
