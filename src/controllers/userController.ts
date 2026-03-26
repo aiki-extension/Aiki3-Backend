@@ -114,3 +114,33 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
   const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
   return reply.send(userSettingsDto);
 }
+
+// DELETE /api/users/settings/time-wasting-sites/:domain
+export async function deleteUserTimeWastingSite(req: FastifyRequest, reply: FastifyReply) {
+  const userId = req.user.id;
+  const { domain } = req.params as { domain: string };
+
+  try {
+    const website = await prisma.website.findUnique({
+      where: { domain },
+    });
+
+    if (!website) {
+      return reply.status(404).send({ message: "Time-wasting site not found" });
+    }
+
+    await prisma.userTimeWastingSite.delete({
+      where: {
+        userId_websiteId: {
+          userId,
+          websiteId: website.id,
+        }
+      }
+    });
+
+    return reply.status(200).send({ message: "Deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting time-wasting site:", error);
+    return reply.status(500).send({ message: "Failed to delete time-wasting site" });
+  }
+}
