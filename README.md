@@ -12,6 +12,9 @@
 6. Start the development server: `npm run dev`
 7. Access the API at `http://localhost:<port>` and the Swagger UI documentation at `http://localhost:<port>/docs`, where `<port>` is the port set in your `.env` file.
 
+### Note:
+You may also find the `quick-setup.sh` script to be useful when having to quickly setup the backend for local testing. (Currently targets shells for Linux systems)
+
 ## Technologies
 | Technology | Role |
 |---|---|
