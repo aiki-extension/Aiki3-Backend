@@ -32,6 +32,7 @@ export default async function userRoutes(app: FastifyInstance) {
         minProperties: 1,
         additionalProperties: false,
         properties: {
+          learningSiteDomain: { type: "string" },
           dailyLearningGoalMinutes: { type: "number" },
           rewardTimeMinutes: { type: "number" },
           sessionDurationMinutes: { type: "number" },

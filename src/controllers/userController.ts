@@ -70,15 +70,25 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
     include: {
       timeWastingSites: {
         include: { website: true }
-      }
-    }
+    },
+      learningSite: {
+        include: {
+          website: true,
+        },
+      },
+    },
   });
 
   if (!user) {
     return reply.status(404).send({ message: "User not found" });
   }
 
-  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
+  const learningSiteDomain = user.learningSite?.website.domain;
+  const userSettingsDto: UserSettingsDto = toUserSettingsDto(
+    learningSiteDomain !== undefined
+      ? { ...user, learningSiteDomain }
+      : user
+  );
   return reply.send(userSettingsDto);
 }
 
@@ -102,6 +112,26 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
     });
 
   }
+
+  if (payload.learningSiteDomain !== undefined ) {
+
+    const website = await prisma.website.upsert({
+      where: { domain: payload.learningSiteDomain },
+      update: {},
+      create: { domain: payload.learningSiteDomain },
+    });
+
+    await prisma.userLearningSite.upsert({
+      where: { userId: userId },
+      update: { websiteId: website.id },
+      create: {
+        userId: userId,
+        websiteId: website.id,
+      },
+    });
+  }
+
+
 
   const user = await prisma.user.update({
     where: { id: userId },

@@ -30,7 +30,7 @@ model User {
   operatingStartMinutes Int
   operatingEndMinutes Int
   timeWastingSites UserTimeWastingSite[]
-  learningSites UserLearningSite[]
+  learningSite UserLearningSite?
   siteSessions SiteSession[]
   behaviorLogs UserBehaviorLog[]
 }
@@ -45,7 +45,7 @@ model Website {
 }
 
 model UserTimeWastingSite {
-  userId Int
+  userId Int 
   websiteId Int
   user User @relation(fields: [userId], references: [id])
   website Website @relation(fields: [websiteId], references: [id])
@@ -53,7 +53,7 @@ model UserTimeWastingSite {
 }
 
 model UserLearningSite {
-  userId Int
+  userId Int @unique
   websiteId Int
   user User @relation(fields: [userId], references: [id])
   website Website @relation(fields: [websiteId], references: [id])

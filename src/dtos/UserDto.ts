@@ -22,6 +22,7 @@ export interface UserSettingsDto {
   operatingStartMinutes: number;
   operatingEndMinutes: number;
   timeWastingSites: string[];
+  learningSiteDomain?: string;
 }
 
 export interface UpdateUserSettingsDto {
@@ -32,6 +33,7 @@ export interface UpdateUserSettingsDto {
   operatingStartMinutes?: number;
   operatingEndMinutes?: number;
   timeWastingSite?: string;
+  learningSiteDomain?: string;
 }
 
 export function toUserDto(user: User): UserDto {
@@ -47,9 +49,10 @@ export function toUserDto(user: User): UserDto {
   };
 }
 
-export function toUserSettingsDto(user: User & { timeWastingSites: (UserTimeWastingSite & { website: Website})[] }
+export function toUserSettingsDto(user: User & { learningSiteDomain?: string;} &  { timeWastingSites: (UserTimeWastingSite & { website: Website})[] }
 ): UserSettingsDto {
   return {
+    ...(user.learningSiteDomain && { learningSiteDomain: user.learningSiteDomain }),
     dailyLearningGoalMinutes: user.dailyLearningGoalMinutes,
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
