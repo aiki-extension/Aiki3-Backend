@@ -47,9 +47,9 @@ erDiagram
     }
 
     users ||--o{ user_time_wasting_sites : "has"
-    users ||--o{ user_learning_sites : "has"
+    users ||--o| user_learning_site : "has"
     websites ||--o{ user_time_wasting_sites : "categorized as"
-    websites ||--o{ user_learning_sites : "categorized as"
+    websites ||--o{ user_learning_site : "categorized as"
     users ||--o{ site_sessions : "has"
     websites ||--o{ site_sessions : "visited in"
     websites ||--o{ site_sessions : "triggered"
