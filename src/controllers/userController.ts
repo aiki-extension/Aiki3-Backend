@@ -68,7 +68,7 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
-      learningSites: {
+      learningSite: {
         include: {
           website: true,
         },
@@ -80,7 +80,7 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
     return reply.status(404).send({ message: "User not found" });
   }
 
-  const learningSiteDomain = user.learningSites?.website.domain;
+  const learningSiteDomain = user.learningSite?.website.domain;
   const userSettingsDto: UserSettingsDto = toUserSettingsDto(
     learningSiteDomain !== undefined
       ? { ...user, learningSiteDomain }
