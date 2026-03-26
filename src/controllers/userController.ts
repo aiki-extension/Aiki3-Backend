@@ -4,6 +4,7 @@ import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
 import { toUserDto, toUserSettingsDto, toUserSettingsUpdateData, type UpdateUserSettingsDto, type UserDto, type UserSettingsDto } from "../dtos/UserDto.js";
 import { signToken } from "../lib/signToken.js";
+import { validateInviteCode } from "../lib/validateInviteCode.js";
 
 const SALT_ROUNDS = 10;
 
@@ -16,8 +17,13 @@ const OPERATING_END_MINUTES_DEFAULT = 1020; // 17:00 (17 * 60)
 
 // POST /api/users
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
-  const { email, password } = req.body as { email: string; password: string };
+  const { email, password, inviteCode } = req.body as { email: string; password: string; inviteCode?: string };
 
+  if (inviteCode !== undefined) {
+    const valid = await validateInviteCode(inviteCode, reply);
+    if (!valid) return;
+  }
+ 
   // note: email hash is vulnerable to rainbow table. consider hmac in future if this becomes a concern.
   const email_hashed = hashEmail(email);
 
@@ -34,11 +40,11 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
       lastActive: new Date(),
       operatingStartMinutes: OPERATING_START_MINUTES_DEFAULT,
       operatingEndMinutes: OPERATING_END_MINUTES_DEFAULT,
+      ...(inviteCode !== undefined && {
+        inviteCode: { connect: { code: inviteCode } },
+      }),
     },
   });
-
-  // const userDto: UserDto = toUserDto(user);
-  // return reply.status(201).send(userDto);
 
   // login the user immediately after registration
   const token = await signToken(reply, user);
@@ -94,15 +100,8 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
       return reply.send(toUserSettingsDto(user));
     }
 
-    const inviteCode = await prisma.inviteCode.findUnique({
-      where: { code: payload.inviteCode },
-    });
-    if (!inviteCode) {
-      return reply.status(404).send({ error: "Invite code not found" });
-    }
-    if (!inviteCode.isActive) {
-      return reply.status(400).send({ error: "Invite code is no longer active" });
-    }
+    const valid = await validateInviteCode(payload.inviteCode, reply);
+    if (!valid) return;
   }
 
   const user = await prisma.user.update({
