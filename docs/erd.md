@@ -24,7 +24,7 @@ erDiagram
         int website_id FK
     }
 
-    user_learning_sites {
+    user_learning_site {
         int user_id FK
         int website_id FK
     }
