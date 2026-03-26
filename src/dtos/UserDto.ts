@@ -31,8 +31,7 @@ export interface UpdateUserSettingsDto {
   lastActive?: Date;
   operatingStartMinutes?: number;
   operatingEndMinutes?: number;
-  addTimeWastingSites?: string[];
-  removeTimeWastingSites?: string[];
+  timeWastingSite?: string;
 }
 
 export function toUserDto(user: User): UserDto {

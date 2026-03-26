@@ -86,46 +86,26 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 export async function updateUserSettings(req: FastifyRequest, reply: FastifyReply) {
   const userId = req.user.id;
   const payload = req.body as UpdateUserSettingsDto;
-  
-  // Seperate time wasting site arrays from other settings
-  const { addTimeWastingSites, removeTimeWastingSites, ...remainingSettings } = payload;
 
-  let sitesToRemove = {};
-  if (removeTimeWastingSites?.length) {
-    // Looks up the website IDs for the given domains
-    const websites = await prisma.website.findMany({
-      where: { domain: { in: removeTimeWastingSites } },
-      select: { id: true },
+  if (payload.timeWastingSite !== undefined){
+    // Check if website exists, if not create it
+    const website = await prisma.website.upsert({
+      where: { domain: payload.timeWastingSite },
+      update: {},
+      create: { domain: payload.timeWastingSite },
     });
-    sitesToRemove = {
-      timeWastingSites: {
-        deleteMany: { websiteId: { in: websites.map((w) => w.id) } },
-      },
-    }
-  }
 
-  if (addTimeWastingSites?.length) {
-    for (const domain of addTimeWastingSites) {
-      // Reuse existing website if the domain already exists, otherwise create it
-      const website = await prisma.website.upsert({
-        where: { domain },
-        create: { domain },
-        update: {},
-      });
-      // Link the website to the user if not already linked, otherwise do nothing
-      await prisma.userTimeWastingSite.createMany({
-        data: [{ userId, websiteId: website.id }],
-        skipDuplicates: true,
-      });
-    }
+    await prisma.userTimeWastingSite.upsert({
+      where: { userId_websiteId: { userId, websiteId: website.id } },
+      update: {},
+      create: { userId, websiteId: website.id },
+    });
+
   }
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data: { // "..." merges the two data together
-      ...toUserSettingsUpdateData(remainingSettings),
-      ...sitesToRemove,
-    },
+    data: toUserSettingsUpdateData(payload), 
     include: {
       timeWastingSites: { include: { website: true } },
     },

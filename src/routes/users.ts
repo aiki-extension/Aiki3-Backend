@@ -5,6 +5,7 @@ import {
   getUserSettings,
   updateUserSettings
 } from "../controllers/userController.js";
+import { time } from "node:console";
 
 export default async function userRoutes(app: FastifyInstance) {
   // Schema validation for creating a user
@@ -36,6 +37,7 @@ export default async function userRoutes(app: FastifyInstance) {
           lastActive: { type: "string", format: "date-time" },
           operatingStartMinutes: { type: "number" },
           operatingEndMinutes: { type: "number" },
+          timeWastingSite: { type: "string" },
         },
       },
     },
