@@ -16,6 +16,7 @@ export default async function userRoutes(app: FastifyInstance) {
         properties: {
           email: { type: "string", format: "email" },
           password: { type: "string", minLength: 6 },
+          inviteCode: { type: "string" },
         },
       },
     },
@@ -31,6 +32,7 @@ export default async function userRoutes(app: FastifyInstance) {
         additionalProperties: false,
         properties: {
           learningSiteDomain: { type: "string" },
+          inviteCode: { type: "string" },
           dailyLearningGoalMinutes: { type: "number" },
           rewardTimeMinutes: { type: "number" },
           sessionDurationMinutes: { type: "number" },
