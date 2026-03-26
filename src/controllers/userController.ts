@@ -67,13 +67,25 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    include: {
+      learningSites: {
+        include: {
+          website: true,
+        },
+      },
+    },
   });
 
   if (!user) {
     return reply.status(404).send({ message: "User not found" });
   }
 
-  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
+  const learningSiteDomain = user.learningSites?.website.domain;
+  const userSettingsDto: UserSettingsDto = toUserSettingsDto(
+    learningSiteDomain !== undefined
+      ? { ...user, learningSiteDomain }
+      : user
+  );
   return reply.send(userSettingsDto);
 }
 
@@ -81,6 +93,26 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
 export async function updateUserSettings(req: FastifyRequest, reply: FastifyReply) {
   const userId = req.user.id;
   const payload = req.body as UpdateUserSettingsDto;
+
+  if (payload.learningSiteDomain !== undefined ) {
+
+    const website = await prisma.website.upsert({
+      where: { domain: payload.learningSiteDomain },
+      update: {},
+      create: { domain: payload.learningSiteDomain },
+    });
+
+    await prisma.userLearningSite.upsert({
+      where: { userId: userId },
+      update: { websiteId: website.id },
+      create: {
+        userId: userId,
+        websiteId: website.id,
+      },
+    });
+  }
+
+
 
   const user = await prisma.user.update({
     where: { id: userId },
