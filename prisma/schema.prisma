@@ -22,6 +22,7 @@ model User {
   email_hashed String   @unique
   password     String
   createdAt    DateTime @default(now())
+  inviteCodeId Int?
   isResearchParticipant Boolean
   dailyLearningGoalMinutes Int
   rewardTimeMinutes Int
@@ -29,10 +30,18 @@ model User {
   lastActive DateTime
   operatingStartMinutes Int
   operatingEndMinutes Int
+  inviteCode InviteCode? @relation(fields: [inviteCodeId], references: [id])
   timeWastingSites UserTimeWastingSite[]
   learningSite UserLearningSite?
   siteSessions SiteSession[]
   behaviorLogs UserBehaviorLog[]
+}
+
+model InviteCode {
+  id Int @id @default(autoincrement())
+  code String @unique
+  isActive Boolean @default(true)
+  users User[]
 }
 
 model Website {

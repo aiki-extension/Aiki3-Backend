@@ -15,6 +15,7 @@ export interface UserDto {
 // Used to fetch and update user settings
 export interface UserSettingsDto {
   dailyLearningGoalMinutes: number;
+  inviteCode?: { code: string; isActive: boolean };
   rewardTimeMinutes: number;
   sessionDurationMinutes: number;
   lastActive: Date;
@@ -31,6 +32,7 @@ export interface UpdateUserSettingsDto {
   operatingStartMinutes?: number;
   operatingEndMinutes?: number;
   learningSiteDomain?: string;
+  inviteCode?: string;
 }
 
 export function toUserDto(user: User): UserDto {
@@ -46,16 +48,21 @@ export function toUserDto(user: User): UserDto {
   };
 }
 
-export function toUserSettingsDto(user: User & { learningSiteDomain?: string;}): UserSettingsDto {
+export function toUserSettingsDto(user: User & { 
+  learningSiteDomain?: string; 
+  inviteCode: { code: string; isActive: boolean } | null 
+}): UserSettingsDto {
   return {
     ...(user.learningSiteDomain && { learningSiteDomain: user.learningSiteDomain }),
+    ...(user.inviteCode && {
+      inviteCode: { code: user.inviteCode.code, isActive: user.inviteCode.isActive },
+    }),
     dailyLearningGoalMinutes: user.dailyLearningGoalMinutes,
     rewardTimeMinutes: user.rewardTimeMinutes,
     sessionDurationMinutes: user.sessionDurationMinutes,
     lastActive: user.lastActive,
     operatingStartMinutes: user.operatingStartMinutes,
     operatingEndMinutes: user.operatingEndMinutes,
-    
   };
 }
 
@@ -76,6 +83,9 @@ export function toUserSettingsUpdateData(input: UpdateUserSettingsDto) {
     }),
     ...(input.operatingEndMinutes !== undefined && {
       operatingEndMinutes: input.operatingEndMinutes,
+    }),
+    ...(input.inviteCode !== undefined && {
+      inviteCode: { connect: { code: input.inviteCode } },
     }),
   };
 }
