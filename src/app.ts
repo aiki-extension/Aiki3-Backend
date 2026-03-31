@@ -21,7 +21,7 @@ export async function buildApp() {
   // Register Swagger for API documentation
   await app.register(swagger, {
     openapi: {
-      info: { title: "Aiki3 API Documentation", version: "1.0.0" },
+      info: { title: "Aiki3 API Documentation", version: "1.1.0" },
       components: {
         securitySchemes: {
           bearerAuth: {
@@ -64,6 +64,8 @@ export async function buildApp() {
   // Register route modules
   app.register(authRoutes, { prefix: "/api/auth" });
   app.register(userRoutes, { prefix: "/api/users" });
+
+
 
   return app;
 }

@@ -5,6 +5,7 @@ erDiagram
         string email_hashed
         string password
         datetime created_at
+        int invite_code_id FK
         boolean is_research_participant
         int daily_learning_goal
         int reward_time_minutes
@@ -12,6 +13,12 @@ erDiagram
         datetime last_active
         time operating_hours_start
         time operating_hours_end
+    }
+
+    invite_codes {
+        int id PK
+        string code UK
+        boolean is_active
     }
 
     websites {
@@ -24,7 +31,7 @@ erDiagram
         int website_id FK
     }
 
-    user_learning_sites {
+    user_learning_site {
         int user_id FK
         int website_id FK
     }
@@ -46,10 +53,11 @@ erDiagram
         varchar action
     }
 
+    invite_codes o|--o{ users : "has"
     users ||--o{ user_time_wasting_sites : "has"
-    users ||--o{ user_learning_sites : "has"
+    users ||--o| user_learning_site : "has"
     websites ||--o{ user_time_wasting_sites : "categorized as"
-    websites ||--o{ user_learning_sites : "categorized as"
+    websites ||--o{ user_learning_site : "categorized as"
     users ||--o{ site_sessions : "has"
     websites ||--o{ site_sessions : "visited in"
     websites ||--o{ site_sessions : "triggered"

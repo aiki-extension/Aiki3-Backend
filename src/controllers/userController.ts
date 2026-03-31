@@ -4,6 +4,7 @@ import { hashEmail } from "../lib/hashEmail.js";
 import prisma from "../lib/prisma.js";
 import { toUserDto, toUserSettingsDto, toUserSettingsUpdateData, type UpdateUserSettingsDto, type UserDto, type UserSettingsDto } from "../dtos/UserDto.js";
 import { signToken } from "../lib/signToken.js";
+import { validateInviteCode } from "../lib/validateInviteCode.js";
 
 const SALT_ROUNDS = 10;
 
@@ -16,8 +17,13 @@ const OPERATING_END_MINUTES_DEFAULT = 1020; // 17:00 (17 * 60)
 
 // POST /api/users
 export async function createUser(req: FastifyRequest, reply: FastifyReply) {
-  const { email, password } = req.body as { email: string; password: string };
+  const { email, password, inviteCode } = req.body as { email: string; password: string; inviteCode?: string };
 
+  if (inviteCode !== undefined) {
+    const valid = await validateInviteCode(inviteCode, reply);
+    if (!valid) return;
+  }
+ 
   // note: email hash is vulnerable to rainbow table. consider hmac in future if this becomes a concern.
   const email_hashed = hashEmail(email);
 
@@ -34,11 +40,11 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
       lastActive: new Date(),
       operatingStartMinutes: OPERATING_START_MINUTES_DEFAULT,
       operatingEndMinutes: OPERATING_END_MINUTES_DEFAULT,
+      ...(inviteCode !== undefined && {
+        inviteCode: { connect: { code: inviteCode } },
+      }),
     },
   });
-
-  // const userDto: UserDto = toUserDto(user);
-  // return reply.status(201).send(userDto);
 
   // login the user immediately after registration
   const token = await signToken(reply, user);
@@ -64,22 +70,31 @@ export async function getCurrentUser(req: FastifyRequest, reply: FastifyReply) {
 // GET /api/users/settings
 export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) {
   const userId = req.user.id;
-
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       timeWastingSites: {
         include: { website: true }
-      }
-    }
+      },
+      learningSite: {
+        include: {
+          website: true,
+        },
+      },
+      inviteCode: true,
+    },
   });
 
   if (!user) {
     return reply.status(404).send({ message: "User not found" });
   }
 
-  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
-  return reply.send(userSettingsDto);
+  const learningSiteDomain = user.learningSite?.website.domain;
+  return reply.send(toUserSettingsDto(
+    learningSiteDomain !== undefined
+      ? { ...user, learningSiteDomain }
+      : user
+  ));
 }
 
 // PATCH /api/users/settings
@@ -100,7 +115,39 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
       update: {},
       create: { userId, websiteId: website.id },
     });
+  }
+  if (payload.learningSiteDomain !== undefined) {
+    const website = await prisma.website.upsert({
+      where: { domain: payload.learningSiteDomain },
+      update: {},
+      create: { domain: payload.learningSiteDomain },
+    });
+    await prisma.userLearningSite.upsert({
+      where: { userId: userId },
+      update: { websiteId: website.id },
+      create: {
+        userId: userId,
+        websiteId: website.id,
+      },
+    });
+  }
 
+  if (payload.inviteCode !== undefined) {
+
+    // If the inviteCode is an empty string, remove the existing invite code
+    if (payload.inviteCode === "") {
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { inviteCode: { disconnect: true } },
+        include: { 
+          timeWastingSites: { include: { website: true} },
+          inviteCode: true 
+        },
+      });
+      return reply.send(toUserSettingsDto(user));
+    }
+    const valid = await validateInviteCode(payload.inviteCode, reply);
+    if (!valid) return;
   }
 
   const user = await prisma.user.update({
@@ -108,11 +155,11 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
     data: toUserSettingsUpdateData(payload), 
     include: {
       timeWastingSites: { include: { website: true } },
+      inviteCode: true,
     },
   });
 
-  const userSettingsDto: UserSettingsDto = toUserSettingsDto(user);
-  return reply.send(userSettingsDto);
+  return reply.send(toUserSettingsDto(user));
 }
 
 // DELETE /api/users/settings/time-wasting-sites/:domain
