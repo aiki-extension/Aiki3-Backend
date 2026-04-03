@@ -1,4 +1,5 @@
 import type { User } from "../generated/prisma/client.js";
+import type { UserTimeWastingSite, Website } from "../generated/prisma/client.js";
 
 export interface UserDto {
   createdAt: Date;
@@ -21,6 +22,7 @@ export interface UserSettingsDto {
   lastActive: Date;
   operatingStartMinutes: number;
   operatingEndMinutes: number;
+  timeWastingSites: string[];
   learningSiteDomain?: string;
 }
 
@@ -31,6 +33,7 @@ export interface UpdateUserSettingsDto {
   lastActive?: Date;
   operatingStartMinutes?: number;
   operatingEndMinutes?: number;
+  timeWastingSite?: string;
   learningSiteDomain?: string;
   inviteCode?: string;
 }
@@ -50,7 +53,8 @@ export function toUserDto(user: User): UserDto {
 
 export function toUserSettingsDto(user: User & { 
   learningSiteDomain?: string; 
-  inviteCode: { code: string; isActive: boolean } | null 
+  inviteCode: { code: string; isActive: boolean } | null
+  timeWastingSites: (UserTimeWastingSite & { website: Website})[] 
 }): UserSettingsDto {
   return {
     ...(user.learningSiteDomain && { learningSiteDomain: user.learningSiteDomain }),
@@ -63,6 +67,7 @@ export function toUserSettingsDto(user: User & {
     lastActive: user.lastActive,
     operatingStartMinutes: user.operatingStartMinutes,
     operatingEndMinutes: user.operatingEndMinutes,
+    timeWastingSites: user.timeWastingSites.map((s) => s.website.domain),
   };
 }
 

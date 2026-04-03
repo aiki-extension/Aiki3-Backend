@@ -73,6 +73,9 @@ export async function getUserSettings(req: FastifyRequest, reply: FastifyReply) 
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
+      timeWastingSites: {
+        include: { website: true }
+      },
       learningSite: {
         include: {
           website: true,
@@ -99,6 +102,20 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
   const userId = req.user.id;
   const payload = req.body as UpdateUserSettingsDto;
 
+  if (payload.timeWastingSite !== undefined){
+    // Check if website exists, if not create it
+    const website = await prisma.website.upsert({
+      where: { domain: payload.timeWastingSite },
+      update: {},
+      create: { domain: payload.timeWastingSite },
+    });
+
+    await prisma.userTimeWastingSite.upsert({
+      where: { userId_websiteId: { userId, websiteId: website.id } },
+      update: {},
+      create: { userId, websiteId: website.id },
+    });
+  }
   if (payload.learningSiteDomain !== undefined) {
     const website = await prisma.website.upsert({
       where: { domain: payload.learningSiteDomain },
@@ -122,7 +139,10 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
       const user = await prisma.user.update({
         where: { id: userId },
         data: { inviteCode: { disconnect: true } },
-        include: { inviteCode: true },
+        include: { 
+          timeWastingSites: { include: { website: true} },
+          inviteCode: true 
+        },
       });
       return reply.send(toUserSettingsDto(user));
     }
@@ -132,8 +152,42 @@ export async function updateUserSettings(req: FastifyRequest, reply: FastifyRepl
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data: toUserSettingsUpdateData(payload),
-    include: { inviteCode: true },
+    data: toUserSettingsUpdateData(payload), 
+    include: {
+      timeWastingSites: { include: { website: true } },
+      inviteCode: true,
+    },
   });
+
   return reply.send(toUserSettingsDto(user));
+}
+
+// DELETE /api/users/settings/time-wasting-sites/:domain
+export async function deleteUserTimeWastingSite(req: FastifyRequest, reply: FastifyReply) {
+  const userId = req.user.id;
+  const { domain } = req.params as { domain: string };
+
+  try {
+    const website = await prisma.website.findUnique({
+      where: { domain },
+    });
+
+    if (!website) {
+      return reply.status(404).send({ message: "Time-wasting site not found" });
+    }
+
+    await prisma.userTimeWastingSite.delete({
+      where: {
+        userId_websiteId: {
+          userId,
+          websiteId: website.id,
+        }
+      }
+    });
+
+    return reply.status(200).send({ message: "Deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting time-wasting site:", error);
+    return reply.status(500).send({ message: "Failed to delete time-wasting site" });
+  }
 }

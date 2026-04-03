@@ -3,8 +3,10 @@ import {
   createUser,
   getCurrentUser,
   getUserSettings,
-  updateUserSettings
+  updateUserSettings,
+  deleteUserTimeWastingSite
 } from "../controllers/userController.js";
+import { time } from "node:console";
 
 export default async function userRoutes(app: FastifyInstance) {
   // Schema validation for creating a user
@@ -39,6 +41,7 @@ export default async function userRoutes(app: FastifyInstance) {
           lastActive: { type: "string", format: "date-time" },
           operatingStartMinutes: { type: "number" },
           operatingEndMinutes: { type: "number" },
+          timeWastingSite: { type: "string" },
         },
       },
     },
@@ -48,4 +51,7 @@ export default async function userRoutes(app: FastifyInstance) {
   app.get("/me", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getCurrentUser);
   app.get("/settings", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } }, getUserSettings);
   app.patch("/settings", updateUserSettingsSchema, updateUserSettings);
+  app.delete("/settings/time-wasting-sites/:domain", { preHandler: [app.authenticate], schema: { security: [{ bearerAuth: [] }] } },
+  deleteUserTimeWastingSite
+  );
 }
