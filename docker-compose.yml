@@ -1,7 +1,7 @@
 services:
-  fastify_db:
+  aiki_db:
     image: postgres:15
-    container_name: fastify_db
+    container_name: aiki_db
     restart: always
     environment:
       POSTGRES_USER: awesomeuser
