@@ -27,6 +27,15 @@ export async function createUser(req: FastifyRequest, reply: FastifyReply) {
   // note: email hash is vulnerable to rainbow table. consider hmac in future if this becomes a concern.
   const email_hashed = hashEmail(email);
 
+  // check if user with the same hashed email already exists
+  const existingUser = await prisma.user.findUnique({
+    where: { email_hashed }
+  });
+
+  if (existingUser) {
+    return reply.status(409).send({ message: "User with this email already exists" });
+  }
+
   const password_hashed = await bcrypt.hash(password, SALT_ROUNDS);
 
   const user = await prisma.user.create({
