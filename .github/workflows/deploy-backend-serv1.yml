@@ -45,7 +45,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
 
   deploy:
-    name: Deploy to Pi
+    name: Deploy to VPS
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -73,7 +73,7 @@ jobs:
           scp deployment/docker-compose.server.yml \
             $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/docker-compose.server.yml
 
-      # SSH into Pi and deploy
+      # SSH into VPS and deploy
       - name: Deploy on server
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
