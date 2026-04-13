@@ -46,14 +46,6 @@ npm run build
 npm start
 ```
 
-### Environment Variables (Rate Limiting)
-- `RATE_LIMIT_MAX` (default: `100`) controls the global number of requests allowed per time window.
-- `RATE_LIMIT_TIME_WINDOW` (default: `1 minute`) controls the global rate-limit window.
-- `TRUST_PROXY` (default: `false`) should be set to `true` when running behind a reverse proxy (for example Nginx) so IP-based limiting works per client.
-
-### Swagger Availability
-- Swagger docs are registered only when `NODE_ENV` is not `production`.
-
 ### Prisma
 ```bash
 # Create and apply a new database migration

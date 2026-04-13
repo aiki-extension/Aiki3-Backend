@@ -9,15 +9,14 @@ import swaggerUi from "@fastify/swagger-ui";
 
 export async function buildApp() {
   const isProduction = process.env.NODE_ENV === "production";
-  const trustProxy = process.env.TRUST_PROXY?.toLowerCase() === "true";
-  
+
   const maxRequests = 100;
   const timeWindow = "1 minute";
 
   // Create Fastify instance
   const app = Fastify({
     logger: true,
-    trustProxy,
+    trustProxy: true,
     ajv: {
       customOptions: {
         removeAdditional: false,
