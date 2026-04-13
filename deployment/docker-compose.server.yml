@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:15
+    container_name: aiki_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      # Bind mount: DB data lives on the filesystem, survives container removal
+      - /data/aiki-backend/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - aiki_backend_net
+
+  migrate:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: aiki_migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    # Override CMD: only run migrations, then exit cleanly
+    command: ["npx", "prisma", "migrate", "deploy"]
+    networks:
+      - aiki_backend_net
+
+  api:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: aiki_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully  # Only start after migrate exits 0
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      TMDB_READ_ACCESS_TOKEN: ${TMDB_READ_ACCESS_TOKEN}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+      FRONTEND_URL: ${FRONTEND_URL}
+    networks:
+      - aiki_backend_net
+
+networks:
+  aiki_backend_net:
+    driver: bridge
