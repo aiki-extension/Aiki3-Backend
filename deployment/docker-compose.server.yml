@@ -46,10 +46,6 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
-      TMDB_READ_ACCESS_TOKEN: ${TMDB_READ_ACCESS_TOKEN}
-      RESEND_API_KEY: ${RESEND_API_KEY}
-      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
-      FRONTEND_URL: ${FRONTEND_URL}
     networks:
       - aiki_backend_net
 
