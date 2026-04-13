@@ -24,6 +24,7 @@ You may also find the `quick-setup.sh` script to be useful when having to quickl
 | **PostgreSQL** | Database |
 | **pg** | PostgreSQL driver (used by Prisma's adapter) |
 | **@fastify/jwt** | JWT authentication plugin |
+| **@fastify/rate-limit** | Request throttling / abuse protection |
 | **bcrypt** | Password hashing |
 | **@fastify/swagger + swagger-ui** | Auto-generated API documentation |
 
