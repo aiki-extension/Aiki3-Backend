@@ -24,6 +24,7 @@ You may also find the `quick-setup.sh` script to be useful when having to quickl
 | **PostgreSQL** | Database |
 | **pg** | PostgreSQL driver (used by Prisma's adapter) |
 | **@fastify/jwt** | JWT authentication plugin |
+| **@fastify/rate-limit** | Request throttling / abuse protection |
 | **bcrypt** | Password hashing |
 | **@fastify/swagger + swagger-ui** | Auto-generated API documentation |
 
@@ -44,6 +45,14 @@ npm run build
 # Start production server (after build)
 npm start
 ```
+
+### Environment Variables (Rate Limiting)
+- `RATE_LIMIT_MAX` (default: `100`) controls the global number of requests allowed per time window.
+- `RATE_LIMIT_TIME_WINDOW` (default: `1 minute`) controls the global rate-limit window.
+- `TRUST_PROXY` (default: `false`) should be set to `true` when running behind a reverse proxy (for example Nginx) so IP-based limiting works per client.
+
+### Swagger Availability
+- Swagger docs are registered only when `NODE_ENV` is not `production`.
 
 ### Prisma
 ```bash

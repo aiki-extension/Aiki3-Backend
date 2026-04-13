@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import jwt from "@fastify/jwt";
+import rateLimit from "@fastify/rate-limit";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import userRoutes from "./routes/users.js";
 import authRoutes from "./routes/auth.js";
@@ -7,10 +8,16 @@ import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 
 export async function buildApp() {
+  const isProduction = process.env.NODE_ENV === "production";
+  const trustProxy = process.env.TRUST_PROXY?.toLowerCase() === "true";
+  
+  const maxRequests = 100;
+  const timeWindow = "1 minute";
 
   // Create Fastify instance
   const app = Fastify({
     logger: true,
+    trustProxy,
     ajv: {
       customOptions: {
         removeAdditional: false,
@@ -18,24 +25,33 @@ export async function buildApp() {
     },
   });
 
-  // Register Swagger for API documentation
-  await app.register(swagger, {
-    openapi: {
-      info: { title: "Aiki3 API Documentation", version: "1.1.0" },
-      components: {
-        securitySchemes: {
-          bearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT",
+  if (!isProduction) {
+    // Register Swagger only in non-production environments.
+    await app.register(swagger, {
+      openapi: {
+        info: { title: "Aiki3 API Documentation", version: "1.1.0" },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+            },
           },
         },
       },
-    },
-  });
+    });
 
-  // Register Swagger UI to serve the documentation at /docs
-  await app.register(swaggerUi, { routePrefix: "/docs" });
+    await app.register(swaggerUi, { routePrefix: "/docs" });
+  }
+
+  await app.register(rateLimit, {
+    global: true,
+    max: maxRequests,
+    timeWindow: timeWindow,
+    allowList: (request) =>
+      request.url === "/health" || (!isProduction && request.url.startsWith("/docs")),
+  });
 
   // Ensure JWT_SECRET is set before registering the JWT plugin
   if (!process.env.JWT_SECRET) {
@@ -65,7 +81,13 @@ export async function buildApp() {
   app.register(authRoutes, { prefix: "/api/auth" });
   app.register(userRoutes, { prefix: "/api/users" });
 
+  app.get("/health", async () => ({ status: "ok" }));
 
+  app.get("/", async (_req, reply) => {
+    return reply
+      .header("Content-Type", "text/html")
+      .send("<html><body><h1>Aiki3 API</h1></body></html>");
+  });
 
   return app;
 }
