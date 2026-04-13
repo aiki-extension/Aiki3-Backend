@@ -36,7 +36,7 @@ services:
     image: ${IMAGE_NAME}:${IMAGE_TAG}
     container_name: aiki_api
     restart: unless-stopped
-    port:
+    ports:
       - "3000:3000"
     depends_on:
       db:
