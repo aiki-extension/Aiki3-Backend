@@ -7,7 +7,7 @@ on:
 
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/aiki
-  DEPLOY_DIR: /home/${{ secrets.DOCKERHUB_USERNAME }}
+  DEPLOY_DIR: /home/${{ secrets.DEPLOY_USER }}
 
 jobs:
   build-and-push:
