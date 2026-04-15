@@ -13,7 +13,7 @@ export const styles = {
     minHeight: "100vh",
     background: "var(--bg)",
     color: "var(--text)",
-    fontFamily: "'DM Mono', 'Fira Mono', 'Courier New', monospace",
+    fontFamily: "'Manrope', 'Segoe UI', sans-serif",
     fontSize: 14,
   },
   header: {

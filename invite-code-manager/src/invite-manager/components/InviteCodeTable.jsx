@@ -3,6 +3,15 @@ import { styles } from "../styles/styles";
 import { formatInviteCodeDate } from "../utils/date";
 
 export function InviteCodeTable({ loading, filteredCodes, search, onEdit, onDelete }) {
+  const columns = [
+    { label: "Code", align: "left" },
+    { label: "Description", align: "left" },
+    { label: "Status", align: "center" },
+    { label: "Users", align: "center" },
+    { label: "Created", align: "center" },
+    { label: "Actions", align: "center" },
+  ];
+
   if (loading) {
     return <div style={styles.emptyState}>Loading...</div>;
   }
@@ -19,8 +28,8 @@ export function InviteCodeTable({ loading, filteredCodes, search, onEdit, onDele
     <table style={styles.table}>
       <thead>
         <tr>
-          {["Code", "Description", "Status", "Signed-up users", "Created", "Actions"].map((heading) => (
-            <th key={heading} style={styles.th}>{heading}</th>
+          {columns.map((column) => (
+            <th key={column.label} style={{ ...styles.th, textAlign: column.align }}>{column.label}</th>
           ))}
         </tr>
       </thead>
@@ -33,17 +42,17 @@ export function InviteCodeTable({ loading, filteredCodes, search, onEdit, onDele
             <td style={{ ...styles.td, color: "var(--text-secondary)", maxWidth: 220 }}>
               {code.description ?? <span style={{ opacity: 0.35 }}>-</span>}
             </td>
-            <td style={styles.td}>
+            <td style={{ ...styles.td, textAlign: "center" }}>
               <Badge active={code.isActive} />
             </td>
             <td style={{ ...styles.td, textAlign: "center" }}>
               <span style={styles.userCount}>{code.signedUpUsersCount}</span>
             </td>
-            <td style={{ ...styles.td, color: "var(--text-secondary)", whiteSpace: "nowrap" }}>
+            <td style={{ ...styles.td, color: "var(--text-secondary)", whiteSpace: "nowrap", textAlign: "center" }}>
               {formatInviteCodeDate(code.createdAt)}
             </td>
-            <td style={styles.td}>
-              <div style={styles.actions}>
+            <td style={{ ...styles.td, textAlign: "center" }}>
+              <div style={{ ...styles.actions, justifyContent: "center" }}>
                 <button style={styles.btnAction} onClick={() => onEdit(code)} title="Edit">Edit</button>
                 <button
                   style={{ ...styles.btnAction, color: "var(--danger)" }}
