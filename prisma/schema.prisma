@@ -41,6 +41,8 @@ model InviteCode {
   id Int @id @default(autoincrement())
   code String @unique
   isActive Boolean @default(true)
+  description String?
+  createdAt DateTime @default(now())
   users User[]
 }
 
