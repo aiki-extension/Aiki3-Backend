@@ -90,8 +90,7 @@ export default function InviteCodeManager() {
 
       <header style={styles.header}>
         <div style={styles.headerLeft}>
-          <div style={styles.logoMark} />
-          <span style={styles.headerTitle}>Invite Manager</span>
+          <span style={styles.headerTitle}>Invite Code Manager</span>
         </div>
         <div style={styles.headerRight}>
           <span style={styles.codesCount}>{codes.length} codes</span>

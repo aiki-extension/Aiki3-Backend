@@ -87,7 +87,7 @@ export const styles = {
     letterSpacing: "0.04em",
   },
   badgeActive: { background: "rgba(46,184,122,0.15)", color: "var(--success)" },
-  badgeInactive: { background: "rgba(122,128,153,0.12)", color: "var(--text-secondary)" },
+  badgeInactive: { background: "rgba(224,92,92,0.16)", color: "var(--danger)" },
   userCount: {
     display: "inline-flex",
     alignItems: "center",

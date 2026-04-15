@@ -25,8 +25,7 @@ export function LoginScreen({ onLogin }) {
     <div style={styles.loginWrapper}>
       <div style={styles.loginCard}>
         <div style={styles.loginLogo}>
-          <div style={styles.logoMark} />
-          <span style={styles.logoText}>Invite Manager</span>
+          <span style={styles.logoText}>Invite Code Manager</span>
         </div>
         <p style={styles.loginSub}>Sign in to manage invite codes</p>
 
