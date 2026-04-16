@@ -1,0 +1,14 @@
+services:
+  ic-manager:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: aiki_ic_manager
+    restart: unless-stopped
+    networks:
+      aiki_shared_net:
+        aliases:
+          - aiki_ic_manager
+
+networks:
+  aiki_shared_net:
+    external: true
+    name: aiki_shared_net

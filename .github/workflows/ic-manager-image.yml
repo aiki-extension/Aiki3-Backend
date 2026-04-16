@@ -1,0 +1,88 @@
+name: Build and Push IC Manager Image
+
+on:
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/aiki-ic-manager
+  DEPLOY_DIR: /home/${{ secrets.DEPLOY_USER }}
+
+jobs:
+  build-and-push:
+    name: Build and Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: amd64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./invite-code-manager
+          file: ./invite-code-manager/deployment/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:cache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:cache,mode=max
+
+  deploy:
+    name: Deploy to VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH key
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_SSH_KEY: ${{ secrets.VPS_PRIVATEKEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Copy IC manager compose file to server
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          scp deployment/docker-compose.ic-manager.server.yml \
+            $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/docker-compose.ic-manager.server.yml
+
+      - name: Deploy IC manager on server
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh $DEPLOY_USER@$DEPLOY_HOST bash -s <<EOF
+          set -e
+          cd ${{ env.DEPLOY_DIR }}
+          cat > .env.ic-manager <<ENVEOF
+          IMAGE_NAME=${{ env.IMAGE_NAME }}
+          IMAGE_TAG=${{ github.sha }}
+          ENVEOF
+          docker network inspect aiki_shared_net >/dev/null 2>&1 || docker network create aiki_shared_net
+          docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker compose --project-name ic-manager --env-file .env.ic-manager -f docker-compose.ic-manager.server.yml up -d --remove-orphans
+          docker image prune -f
+          EOF
