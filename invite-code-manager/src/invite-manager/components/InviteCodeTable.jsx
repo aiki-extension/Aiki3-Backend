@@ -4,8 +4,8 @@ import { formatInviteCodeDate } from "../utils/date";
 
 export function InviteCodeTable({ loading, filteredCodes, search, onEdit, onDelete }) {
   const columns = [
-    { label: "Code", align: "left" },
-    { label: "Description", align: "left" },
+    { label: "Code", align: "center" },
+    { label: "Description", align: "center" },
     { label: "Status", align: "center" },
     { label: "Users", align: "center" },
     { label: "Created", align: "center" },
