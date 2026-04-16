@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import {
   createInviteCode,
   deleteInviteCode,
@@ -6,12 +7,21 @@ import {
   listInviteCodes,
   updateInviteCode,
 } from "../controllers/inviteCodeController.js";
+import { hashEmail } from "../lib/hashEmail.js";
+
+const INVITE_MANAGER_ADMIN_EMAIL_HASH = hashEmail("admin@aiki.com");
+
+function requireInviteManagerAdmin(req: FastifyRequest, reply: FastifyReply) {
+  if (req.user.name !== INVITE_MANAGER_ADMIN_EMAIL_HASH) {
+    return reply.status(403).send({ message: "Forbidden" });
+  }
+}
 
 export default async function inviteCodeRoutes(app: FastifyInstance) {
   app.get(
     "/",
     {
-      preHandler: [app.authenticate],
+      preHandler: [app.authenticate, requireInviteManagerAdmin],
       schema: {
         security: [{ bearerAuth: [] }],
       },
@@ -22,7 +32,7 @@ export default async function inviteCodeRoutes(app: FastifyInstance) {
   app.get(
     "/:id",
     {
-      preHandler: [app.authenticate],
+      preHandler: [app.authenticate, requireInviteManagerAdmin],
       schema: {
         security: [{ bearerAuth: [] }],
         params: {
@@ -40,7 +50,7 @@ export default async function inviteCodeRoutes(app: FastifyInstance) {
   app.post(
     "/",
     {
-      preHandler: [app.authenticate],
+      preHandler: [app.authenticate, requireInviteManagerAdmin],
       schema: {
         security: [{ bearerAuth: [] }],
         body: {
@@ -61,7 +71,7 @@ export default async function inviteCodeRoutes(app: FastifyInstance) {
   app.patch(
     "/:id",
     {
-      preHandler: [app.authenticate],
+      preHandler: [app.authenticate, requireInviteManagerAdmin],
       schema: {
         security: [{ bearerAuth: [] }],
         params: {
@@ -89,7 +99,7 @@ export default async function inviteCodeRoutes(app: FastifyInstance) {
   app.delete(
     "/:id",
     {
-      preHandler: [app.authenticate],
+      preHandler: [app.authenticate, requireInviteManagerAdmin],
       schema: {
         security: [{ bearerAuth: [] }],
         params: {
