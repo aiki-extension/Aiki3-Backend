@@ -72,6 +72,8 @@ jobs:
         run: |
           scp deployment/docker-compose.server.yml \
             $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/docker-compose.server.yml
+          scp deployment/nginx.conf \
+            $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/nginx.conf
 
       # SSH into VPS and deploy
       - name: Deploy on server
