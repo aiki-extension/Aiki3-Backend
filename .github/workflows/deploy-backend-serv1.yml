@@ -92,7 +92,9 @@ jobs:
           POSTGRES_DB=${{ secrets.PROD_POSTGRES_DB }}
           JWT_SECRET="${{ secrets.PROD_JWT_SECRET }}"
           ENVEOF
+          docker network inspect aiki_shared_net >/dev/null 2>&1 || docker network create aiki_shared_net
+          docker compose --env-file .env -f docker-compose.server.yml down --remove-orphans || true
           docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker compose --env-file .env -f docker-compose.server.yml up -d --remove-orphans
+          docker compose --env-file .env -f docker-compose.server.yml up -d --remove-orphans --force-recreate
           docker image prune -f
           EOF
