@@ -11,9 +11,9 @@ import { hashEmail } from "../lib/hashEmail.js";
 
 const INVITE_MANAGER_ADMIN_EMAIL_HASH = hashEmail("admin@aiki.com");
 
-function requireInviteManagerAdmin(req: FastifyRequest, reply: FastifyReply) {
+async function requireInviteManagerAdmin(req: FastifyRequest, reply: FastifyReply): Promise<void> {
   if (req.user.name !== INVITE_MANAGER_ADMIN_EMAIL_HASH) {
-    return reply.status(403).send({ message: "Forbidden" });
+    reply.status(403).send({ message: "Forbidden" });
   }
 }
 
