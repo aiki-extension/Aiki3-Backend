@@ -1,6 +1,3 @@
-import type { User } from '../generated/prisma/client.js';
-import prisma from '../lib/prisma.js';
-
 type InviteCode = { code: string } | null;
 
 const redirectPrompt = (inviteCode: InviteCode): boolean => {
