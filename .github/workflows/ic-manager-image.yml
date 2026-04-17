@@ -1,9 +1,6 @@
 name: Build and Push IC Manager Image
 
 on:
-  push:
-    branches:
-      - feature/invitecode-extensions
   workflow_dispatch:
 
 env:
