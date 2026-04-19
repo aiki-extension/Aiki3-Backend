@@ -19,6 +19,7 @@ export default async function userRoutes(app: FastifyInstance) {
           email: { type: "string", format: "email" },
           password: { type: "string", minLength: 6 },
           inviteCode: { type: "string" },
+          isResearchParticipant: {type: "boolean"},
         },
       },
     },
