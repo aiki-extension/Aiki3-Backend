@@ -1,0 +1,10 @@
+services:
+  ic-manager:
+    image: ${DOCKERHUB_USERNAME:-your-dockerhub-user}/aiki-ic-manager:latest
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    container_name: aiki-ic-manager
+    ports:
+      - "8080:80"
+    restart: unless-stopped

@@ -7,7 +7,9 @@ import { signToken } from "../lib/signToken.js";
 export async function login(req: FastifyRequest, reply: FastifyReply) {
   const { email, password } = req.body as { email: string; password: string };
 
-  const email_hashed = hashEmail(email);
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const email_hashed = hashEmail(normalizedEmail);
 
   const user = await prisma.user.findUnique({ where: { email_hashed } });
 

@@ -19,6 +19,8 @@ erDiagram
         int id PK
         string code UK
         boolean is_active
+        string description
+        datetime created_at
     }
 
     websites {

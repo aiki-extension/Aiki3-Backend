@@ -1,12 +1,10 @@
-name: Build & Deploy Backend
+name: Build and Push IC Manager Image
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/aiki
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/aiki-ic-manager
   DEPLOY_DIR: /home/${{ secrets.DEPLOY_USER }}
 
 jobs:
@@ -34,8 +32,8 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: deployment/api.Dockerfile
+          context: ./invite-code-manager
+          file: ./invite-code-manager/deployment/Dockerfile
           platforms: linux/amd64
           push: true
           tags: |
@@ -52,7 +50,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Set up direct SSH access
       - name: Configure SSH key
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -64,19 +61,15 @@ jobs:
           ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      # Copy compose file to server
-      - name: Copy docker-compose to server
+      - name: Copy IC manager compose file to server
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
-          scp deployment/docker-compose.server.yml \
-            $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/docker-compose.server.yml
-          scp deployment/nginx.conf \
-            $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/nginx.conf
+          scp deployment/docker-compose.ic-manager.server.yml \
+            $DEPLOY_USER@$DEPLOY_HOST:${{ env.DEPLOY_DIR }}/docker-compose.ic-manager.server.yml
 
-      # SSH into VPS and deploy
-      - name: Deploy on server
+      - name: Deploy IC manager on server
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -84,17 +77,12 @@ jobs:
           ssh $DEPLOY_USER@$DEPLOY_HOST bash -s <<EOF
           set -e
           cd ${{ env.DEPLOY_DIR }}
-          cat > .env <<ENVEOF
+          cat > .env.ic-manager <<ENVEOF
           IMAGE_NAME=${{ env.IMAGE_NAME }}
           IMAGE_TAG=${{ github.sha }}
-          POSTGRES_USER=${{ secrets.PROD_POSTGRES_USER }}
-          POSTGRES_PASSWORD="${{ secrets.PROD_POSTGRES_PASSWORD }}"
-          POSTGRES_DB=${{ secrets.PROD_POSTGRES_DB }}
-          JWT_SECRET="${{ secrets.PROD_JWT_SECRET }}"
           ENVEOF
           docker network inspect aiki_shared_net >/dev/null 2>&1 || docker network create aiki_shared_net
-          docker compose --env-file .env -f docker-compose.server.yml down --remove-orphans || true
           docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker compose --env-file .env -f docker-compose.server.yml up -d --remove-orphans --force-recreate
+          docker compose --project-name ic-manager --env-file .env.ic-manager -f docker-compose.ic-manager.server.yml up -d --remove-orphans
           docker image prune -f
           EOF

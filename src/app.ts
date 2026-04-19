@@ -4,6 +4,7 @@ import rateLimit from "@fastify/rate-limit";
 import type { FastifyRequest, FastifyReply } from "fastify";
 import userRoutes from "./routes/users.js";
 import authRoutes from "./routes/auth.js";
+import inviteCodeRoutes from "./routes/inviteCodes.js";
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 
@@ -79,6 +80,7 @@ export async function buildApp() {
   // Register route modules
   app.register(authRoutes, { prefix: "/api/auth" });
   app.register(userRoutes, { prefix: "/api/users" });
+  app.register(inviteCodeRoutes, { prefix: "/api/invite-codes" });
 
   app.get("/health", async () => ({ status: "ok" }));
 
