@@ -1,5 +1,6 @@
 import type { User } from "../generated/prisma/client.js";
 import type { UserTimeWastingSite, Website } from "../generated/prisma/client.js";
+import { featureMap } from "../services/FeatureToggles.js";
 
 export interface UserDto {
   createdAt: Date;
@@ -24,6 +25,9 @@ export interface UserSettingsDto {
   operatingEndMinutes: number;
   timeWastingSites: string[];
   learningSiteDomain?: string;
+  flags: {
+    redirectPrompt: boolean;
+  };
 }
 
 export interface UpdateUserSettingsDto {
@@ -68,6 +72,7 @@ export function toUserSettingsDto(user: User & {
     operatingStartMinutes: user.operatingStartMinutes,
     operatingEndMinutes: user.operatingEndMinutes,
     timeWastingSites: user.timeWastingSites.map((s) => s.website.domain),
+    flags: featureMap(user.inviteCode ?? null),
   };
 }
 
