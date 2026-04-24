@@ -11,9 +11,5 @@ export async function validateInviteCode(code: string, reply: FastifyReply) {
     reply.status(404).send({ error: "Invite code not found" });
     return null;
   }
-  if (!inviteCode.isActive) {
-    reply.status(400).send({ error: "Invite code is no longer active" });
-    return null;
-  }
   return inviteCode;
 }
