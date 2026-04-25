@@ -1,8 +1,8 @@
-type InviteCode = { code: string } | null;
+type InviteCode = { code: string, isActive: boolean } | null;
 
 const redirectPrompt = (inviteCode: InviteCode): boolean => {
-    // Return true only if user has the REDIRECT-CODE (Code to be changed later)
-    return inviteCode?.code === 'REDIRECT-CODE';
+    // Return true only if user has the "AIKI-STUDY-1" code 
+    return inviteCode?.code === 'AIKI-STUDY-1' && inviteCode?.isActive === true;
 }
 
 // Map containing all features for feature flags
