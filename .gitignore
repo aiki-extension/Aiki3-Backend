@@ -4,3 +4,4 @@ dist
 .env
 .env.local
 .vscode
+.package-lock.json
