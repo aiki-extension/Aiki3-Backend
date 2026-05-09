@@ -7,12 +7,12 @@ erDiagram
         datetime created_at
         int invite_code_id FK
         boolean is_research_participant
-        int daily_learning_goal
+        int daily_learning_goal_minutes
         int reward_time_minutes
         int session_duration_minutes
         datetime last_active
-        time operating_hours_start
-        time operating_hours_end
+        int operating_start_minutes
+        int operating_end_minutes
     }
 
     invite_codes {
@@ -51,8 +51,8 @@ erDiagram
         bigint id PK
         int user_id FK
         datetime occurred_at
-        varchar category
-        varchar action
+        string category
+        string action
     }
 
     invite_codes o|--o{ users : "has"
