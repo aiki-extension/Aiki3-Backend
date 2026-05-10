@@ -35,7 +35,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=node:node --chmod=444 package.json ./package.json
-COPY --chown=node:node --from=prod-deps --chmod=555  /app/backend/node_modules ./node_modules
+COPY --chown=node:node --from=prod-deps --chmod=755  /app/backend/node_modules ./node_modules
 COPY --chown=node:node --from=build --chmod=555 /app/backend/dist ./dist
 # Migrations folder is needed by `prisma migrate deploy` (the init container)
 COPY --chown=node:node --from=build --chmod=555 /app/backend/prisma ./prisma
