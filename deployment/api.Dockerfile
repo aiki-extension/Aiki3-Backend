@@ -34,12 +34,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends openssl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chown=node:node package.json ./package.json
-COPY --chown=node:node --from=prod-deps /app/backend/node_modules ./node_modules
-COPY --chown=node:node --from=build /app/backend/dist ./dist
+COPY --chown=node:node --chmod=444 package.json ./package.json
+COPY --chown=node:node --from=prod-deps --chmod=444  /app/backend/node_modules ./node_modules
+COPY --chown=node:node --from=build --chmod=444 /app/backend/dist ./dist
 # Migrations folder is needed by `prisma migrate deploy` (the init container)
-COPY --chown=node:node --from=build /app/backend/prisma ./prisma
-COPY --chown=node:node --from=build /app/backend/prisma.config.ts ./prisma.config.ts
+COPY --chown=node:node --from=build --chmod=444 /app/backend/prisma ./prisma
+COPY --chown=node:node --from=build --chmod=444 /app/backend/prisma.config.ts ./prisma.config.ts
 
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
