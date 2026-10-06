@@ -3,6 +3,8 @@ services:
     image: ${IMAGE_NAME}:${IMAGE_TAG}
     container_name: aiki_ic_manager
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:80"
     networks:
       aiki_shared_net:
         aliases:
